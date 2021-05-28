@@ -195,6 +195,10 @@
           natco3(i,j,k)          =0.
           ocetra(i,j,k,inatcalc) =0. 
 #endif
+#ifdef trc_passive
+! Set initial passive tracer concentration to 1.0 (100%) everywhere
+          ocetra(i,j,k,ipasstrc) = 1.0
+#endif
 #ifdef cisonew
           rco213=ocetra(i,j,k,isco213)/(ocetra(i,j,k,isco212)+safediv)
           rco214=ocetra(i,j,k,isco214)/(ocetra(i,j,k,isco212)+safediv)

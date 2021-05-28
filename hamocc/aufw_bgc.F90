@@ -578,6 +578,10 @@
       CALL NETCDF_DEF_VARDB(ncid,5,'bromo',3,ncdimst,ncvarid,           &
      &    6,'mol/kg',9,'Bromoform',rmissing,47,io_stdo_bgc)
 #endif
+#ifdef trc_passive
+      CALL NETCDF_DEF_VARDB(ncid,7,'passtrc',3,ncdimst,ncvarid,         &
+     &    3,'---',7,'PASSTRC',rmissing,53,io_stdo_bgc)
+#endif
 
 !
 ! Define variables : diagnostic ocean fields
@@ -861,7 +865,9 @@
 #ifdef BROMO
       CALL write_netcdf_var(ncid,'bromo',locetra(1,1,1,ibromo),2*kpke,0)
 #endif
-
+#ifdef trc_passive
+      CALL write_netcdf_var(ncid,'passtrc',locetra(1,1,1,ipasstrc),2*kpke,0)
+#endif
 !
 ! Write restart data : diagtnostic ocean fields
 !

@@ -154,7 +154,7 @@
       INTEGER   :: restday                           !  day of restart file
       INTEGER   :: restdtoce                         !  time step number from bgc ocean file
       INTEGER   :: idate(5),i,j,k
-      logical   :: lread_cfc,lread_nat,lread_iso,lread_atm,lread_bro
+      logical   :: lread_cfc,lread_nat,lread_iso,lread_atm,lread_bro,lread_passtrc
 #ifdef cisonew
       REAL :: rco213,rco214,alpha14,beta13,beta14,d13C_atm,d14cat
 #endif
@@ -320,6 +320,26 @@
       ENDIF
 #endif
 
+! Find out whether to restart passive tracers
+#ifdef trc_passive
+      lread_passtrc=.true.
+      IF(IOTYPE==0) THEN
+         if(mnproc==1) ncstat=nf90_inq_varid(ncid,'passtrc',ncvarid)
+         call xcbcst(ncstat)
+         if(ncstat.ne.nf90_noerr) lread_passtrc=.false.
+      ELSE IF(IOTYPE==1) THEN
+#ifdef PNETCDF
+         ncstat=nfmpi_inq_varid(ncid,'passtrc',ncvarid)
+         if(ncstat.ne.nf_noerr) lread_passtrc=.false.
+#endif
+      ENDIF
+      IF(mnproc==1 .and. .not. lread_passtrc) THEN
+         WRITE(io_stdo_bgc,*) ' '
+         WRITE(io_stdo_bgc,*) 'AUFR_BGC info: Passive tracers not in restart file, '
+         WRITE(io_stdo_bgc,*) ' Passive tracers initialised to 1.'
+      ENDIF
+#endif
+
 ! Find out whether to restart marine carbon isotopes
 #ifdef cisonew
       lread_iso=.true.
@@ -449,9 +469,12 @@
 #ifdef BROMO
       IF(lread_bro) THEN
       CALL read_netcdf_var(ncid,'bromo',locetra(1,1,1,ibromo),2*kpke,0,iotype)
+#endif
+#ifdef trc_passive
+      IF(lread_passtrc) THEN
+         CALL read_netcdf_var(ncid,'passtrc',locetra(1,1,1,ipasstrc),2*kpke,0,iotype)
       ENDIF
 #endif
-
 !
 ! Read restart data : diagnostic ocean fields (needed for bit to bit reproducability)
 !
