@@ -365,7 +365,9 @@
 #ifdef BROMO
       call acclyr(jbromo,ocetra(1,1,1,ibromo),pddpo,1)
 #endif
-
+#ifdef trc_passive
+      call acclyr(jpasstrc,ocetra(1,1,1,ipasstrc),pddpo,1)
+#endif
 
 ! Accumulate level diagnostics
       IF (SUM(jlvlphyto+jlvlgrazer+jlvlphosph+jlvloxygen+jlvliron+      &
@@ -439,6 +441,9 @@
 #endif
 #ifdef BROMO
           call acclvl(jlvlbromo,ocetra(1,1,1,ibromo),k,ind1,ind2,wghts)
+#endif
+#ifdef trc_passive
+          call acclvl(jlvlpasstrc,ocetra(1,1,1,ipasstrc),k,ind1,ind2,wghts)
 #endif
         ENDDO
       ENDIF

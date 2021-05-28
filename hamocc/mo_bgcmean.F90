@@ -469,9 +469,11 @@
 
       INTEGER, DIMENSION(nbgcmax), SAVE ::                              &
      &          jbromo     = 0 ,                                        &
-     &          jlvlbromo  = 0               
+     &          jlvlbromo  = 0 ,                                        &
+     &          jpasstrc      = 0 ,                                     &
+     &          jlvlpasstrc   = 0
 
-      INTEGER, SAVE :: nbgcm3d,nbgcm3dlvl 
+      INTEGER, SAVE :: nbgcm3d,nbgcm3dlvl
 
 !----------------------------------------------------------------
 ! sediment
