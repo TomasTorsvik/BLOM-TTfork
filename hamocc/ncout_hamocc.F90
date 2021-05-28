@@ -303,6 +303,9 @@ subroutine ncwrt_bgc(iogrp)
 #ifdef BROMO
   call finlyr(jbromo(iogrp),jdp(iogrp))
 #endif
+#ifdef trc_passive
+  call finlyr(jpasstrc(iogrp),jdp(iogrp))
+#endif
 
   ! --- Mask sea floor in mass fluxes
   call msksrf(jcarflx0100(iogrp),k0100)
@@ -382,6 +385,9 @@ subroutine ncwrt_bgc(iogrp)
 #endif
 #ifdef BROMO
   call msklvl(jlvlbromo(iogrp),depths)
+#endif
+#ifdef trc_passive
+  call msklvl(jlvlpasstrc(iogrp),depths)
 #endif
 
   ! --- Compute log10 of pH
@@ -553,6 +559,10 @@ subroutine ncwrt_bgc(iogrp)
 #ifdef BROMO
   call wrtlyr(jbromo(iogrp),       LYR_BROMO(iogrp),    1e3,            0.,cmpflg,'bromo')
 #endif
+#ifdef trc_passive
+  call wrtlyr(jpasstrc(iogrp),LYR_PASSTRC(iogrp),1.,0.,cmpflg,                  &
+       &   'passtrc','Passive tracer',' ','-')
+#endif
 
   ! --- Store 3d level fields
   call wrtlvl(jlvldic(iogrp),      LVL_DIC(iogrp),      rnacc*1e3,      0.,cmpflg,'dissiclvl')
@@ -615,6 +625,11 @@ subroutine ncwrt_bgc(iogrp)
 #endif
 #ifdef BROMO
   call wrtlvl(jlvlbromo(iogrp),    LVL_BROMO(iogrp),    rnacc*1e3,      0.,cmpflg,'bromolvl')
+#endif
+#ifdef trc_passive
+  call wrtlvl(jlvlpasstrc(iogrp),LVL_PASSTRC(iogrp),                            &
+       &   rnacc,0.,cmpflg,'passtrclvl',                                        &
+       &   'Passive tracer',' ','-')
 #endif
 
   ! --- Store sediment fields
@@ -801,6 +816,9 @@ subroutine ncwrt_bgc(iogrp)
 #ifdef BROMO
   call inilyr(jbromo(iogrp),0.)
 #endif
+#ifdef trc_passive
+  call inilyr(jpasstrc(iogrp),0.)
+#endif
 
   call inilvl(jlvldic(iogrp),0.)
   call inilvl(jlvlalkali(iogrp),0.)
@@ -862,6 +880,9 @@ subroutine ncwrt_bgc(iogrp)
 #endif
 #ifdef BROMO
   call inilvl(jlvlbromo(iogrp),0.)
+#endif
+#ifdef trc_passive
+  call inilvl(jlvlpasstrc(iogrp),0.)
 #endif
 
 #ifndef sedbypass
@@ -1271,6 +1292,10 @@ subroutine hamoccvardef(iogrp,timeunits,calendar,cmpflg)
   call ncdefvar3d(LYR_BROMO(iogrp),cmpflg,'p',                                  &
        &   'bromo','Bromoform',' ','mol CHBr3 m-3',1)
 #endif
+#ifdef trc_passive
+  call ncdefvar3d(LYR_PASSTRC(iogrp),cmpflg,'p',                                &
+       &   'passtrc','Passive tracer',' ','1',1)
+#endif
 
   ! --- define 3d level fields
   call ncdefvar3d(LVL_DIC(iogrp),cmpflg,'p',                                    &
@@ -1384,6 +1409,10 @@ subroutine hamoccvardef(iogrp,timeunits,calendar,cmpflg)
 #ifdef BROMO
   call ncdefvar3d(LVL_BROMO(iogrp),cmpflg,'p',                                  &
        &   'bromolvl','Bromoform',' ','mol CHBr3 m-3',2)
+#endif
+#ifdef trc_passive
+  call ncdefvar3d(LVL_PASSTRC(iogrp),cmpflg,'p',                                &
+       &   'passtrclvl','Passive tracer',' ','1',2)
 #endif
 
   ! --- define sediment fields

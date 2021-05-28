@@ -120,6 +120,7 @@
      & LYR_NATPH     =0    ,LYR_NATOMEGAA =0    ,LYR_NATOMEGAC =0    ,  &
      & LYR_NATCO3    =0    ,                                            &
      & LYR_BROMO     =0    ,                                            &
+     & LYR_PASSTRC   =0    ,                                            &
      & LYR_D13C      =0    ,LYR_D14C      =0    ,LYR_BIGD14C   =0    ,  &
      & LYR_POC13     =0    ,LYR_DOC13     =0    ,LYR_CALC13    =0    ,  &
      & LYR_PHYTO13   =0    ,LYR_GRAZER13  =0    ,                       &
@@ -139,6 +140,7 @@
      & LVL_NATPH     =0    ,LVL_NATOMEGAA =0    ,LVL_NATOMEGAC =0    ,  &
      & LVL_NATCO3    =0    ,                                            &
      & LVL_BROMO     =0    ,                                            &
+     & LVL_PASSTRC   =0    ,                                            &
      & LVL_D13C      =0    ,LVL_D14C      =0    ,LVL_BIGD14C   =0    ,  &
      & LVL_POC13     =0    ,LVL_DOC13     =0    ,LVL_CALC13    =0    ,  &
      & LVL_PHYTO13   =0    ,LVL_GRAZER13  =0    ,                       &
@@ -198,6 +200,7 @@
      & LYR_NATPH         ,LYR_NATOMEGAA     ,LYR_NATOMEGAC     ,        &
      & LYR_NATCO3        ,                                              &
      & LYR_BROMO         ,                                              &
+     & LYR_PASSTRC       ,                                              &
      & LYR_D13C          ,LYR_D14C          ,LYR_BIGD14C       ,        &
      & LYR_PHYTO13       ,LYR_GRAZER13      ,LYR_POC13         ,        &
      & LYR_DOC13         ,LYR_CALC13        ,                           &
@@ -217,6 +220,7 @@
      & LVL_NATPH         ,LVL_NATOMEGAA     ,LVL_NATOMEGAC     ,        &
      & LVL_NATCO3        ,                                              &
      & LVL_BROMO         ,                                              &
+     & LVL_PASSTRC       ,                                              &
      & LVL_D13C          ,LVL_D14C          ,LVL_BIGD14C       ,        &
      & LVL_PHYTO13       ,LVL_GRAZER13      ,LVL_POC13         ,        &
      & LVL_DOC13         ,LVL_CALC13        ,                           &
@@ -886,6 +890,10 @@
         IF (LYR_BROMO(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
         jbromo(n)=i_bsc_m3d*min(1,LYR_BROMO(n))
 #endif
+#ifdef trc_passive
+        IF (LYR_PASSTRC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+        jpasstrc(n)=i_bsc_m3d*min(1,LYR_PASSTRC(n))
+#endif
 
         IF (LVL_PHYTO(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvlphyto(n)=ilvl_bsc_m3d*min(1,LVL_PHYTO(n))
@@ -998,6 +1006,10 @@
 #ifdef BROMO
         IF (LVL_BROMO(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvlbromo(n)=ilvl_bsc_m3d*min(1,LVL_BROMO(n))
+#endif
+#ifdef trc_passive
+        IF (LVL_PASSTRC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+        jlvlpasstrc(n)=ilvl_bsc_m3d*min(1,LVL_PASSTRC(n))
 #endif
 
         IF (i_bsc_m3d.NE.0) checkdp(n)=1
