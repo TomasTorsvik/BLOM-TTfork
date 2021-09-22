@@ -194,6 +194,16 @@ endif
 set WITH_DMSPH = .false.
 set PI_PH_FILE = ""
 
+# set BGCTRACS defaults
+set WITH_AGG    = .false.
+set WITH_CFC    = .false.
+if ($HAMOCC_CISO == TRUE) then
+   set WITH_CISO   = .true.
+else
+   set WITH_CISO   = .false.
+endif
+set WITH_NATDIC = .false.
+
 # set DIAPHY defaults 
 set GLB_FNAMETAG = "'hd','hm','hy'"  
 set GLB_AVEPERIO =  '1,  30, 365'
@@ -1368,6 +1378,21 @@ cat >>! $RUNDIR/ocn_in$inststr << EOF
   INID14C    = $INID14C
   WITH_DMSPH = $WITH_DMSPH
   PI_PH_FILE = $PI_PH_FILE
+/
+
+! NAMELIST FOR iHAMOCC TRACERS
+!
+! CONTENTS:
+!
+! WITH_AGG    : Turn on/off particle sinking aggregation
+! WITH_CFC    : Turn on/off CFC tracers
+! WITH_CISO   : Turn on/off carbon isotopes
+! WITH_NATDIC : Turn on/off natDIC
+&BGCTRACS
+  WITH_AGG    = $WITH_AGG
+  WITH_CFC    = $WITH_CFC
+  WITH_CISO   = $WITH_CISO
+  WITH_NATDIC = $WITH_NATDIC
 /
 
 ! IO-NAMELIST FOR DIAGNOSTIC iHAMOCC OUTPUT
