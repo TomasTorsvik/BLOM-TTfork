@@ -1,6 +1,6 @@
 ! ------------------------------------------------------------------------------
-! Copyright (C) 2007-2020 Mats Bentsen, Jörg Schwinger, Jerry Tjiputra,
-!                         Alok Kumar Gupta
+! Copyright (C) 2007-2021 Mats Bentsen, Jörg Schwinger, Jerry Tjiputra,
+!                         Alok Kumar Gupta, Tomas Torsvik
 !
 ! This file is part of BLOM.
 !
@@ -21,6 +21,14 @@
 module mod_tracers
 ! ------------------------------------------------------------------------------
 ! This module declares variables related to tracers.
+!
+!  Modified
+!  --------
+!  T.Torsvik,          *UiB, GFI, Bergen*         2021-10-05
+!
+!  - Make the tracer array allocatable.
+!  - Allow a variable number of HAMOCC tracers, to be set from namelist during
+!    run time.
 ! ------------------------------------------------------------------------------
 
    use mod_types, only: r8
@@ -81,6 +89,22 @@ module mod_tracers
              inivar_tracers
 
 contains
+
+   subroutine rdnml_tracers
+   ! ---------------------------------------------------------------------------
+   ! Read tracer control variables from namelist.
+   ! ---------------------------------------------------------------------------
+
+#ifdef HAMOCC
+     use mo_param1_bgc, only: rdnml_hamocc_tracers
+#endif
+
+     implicit none
+
+#ifdef HAMOCC
+     call rdnml_hamocc_tracers
+#endif
+   end subroutine rdnml_tracers
 
    subroutine allocate_tracers
    ! ---------------------------------------------------------------------------
@@ -175,6 +199,9 @@ contains
          uflux, vflux
 
       integer :: i, j, k, l, nt
+
+      ! Read tracer control variables from namelist
+      call rdnml_tracers
 
       ! Allocate tracer arrays
       call allocate_tracers
