@@ -149,11 +149,10 @@
       REAL    :: Kh,Khd,K1,K2,Kb,K1p,K2p,K3p,Ksi,Kw,Ks1,Kf,Kspc,Kspa
       REAL    :: tc,ta,sit,pt,ah1,ac,cu,cb,cc,tc_sat
       REAL    :: omega
-#ifdef CFC
+      !--- CFC variables
       REAL    :: atm_cfc11,atm_cfc12,atm_sf6,fact
       REAL    :: sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf
       REAL    :: flx11,flx12,flxsf,a_11,a_12,a_sf
-#endif
 #ifdef natDIC
       REAL    :: natcu,natcb,natcc
       REAL    :: natpco2,natfluxd,natfluxu,natomega
@@ -199,10 +198,8 @@
 !$OMP  ,cu,cb,cc,pco2,rpp0,scco2,scdms,sco2,oxy,ani,anisa,Xconvxa     &
 !$OMP  ,kwco2,kwdms,kwo2,atco2,ato2,atn2,fluxd,fluxu,oxflux,tc_sat    &
 !$OMP  ,niflux,n2oflux,dmsflux,omega,supsat,undsa,dissol              &
-#ifdef CFC
 !$OMP  ,sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf,a_11,a_12,a_sf,flx11   &
 !$OMP  ,flx12,flxsf,atm_cfc11,atm_cfc12,atm_sf6                       &
-#endif
 #ifdef natDIC
 !$OMP  ,natcu,natcb,natcc,natpco2,natfluxd,natfluxu,natomega          &
 !$OMP  ,natsupsat,natundsa,natdissol                                  &
@@ -298,11 +295,11 @@
       scn2  = 2304.8 - 162.75*t + 6.2557*t2 - 0.13129 *t3 + 0.0011255 *t4
       scdms = 2855.7 - 177.63*t + 6.0438*t2 - 0.11645 *t3 + 0.00094743*t4 
       scn2o = 2356.2 - 166.38*t + 6.3952*t2 - 0.13422 *t3 + 0.0011506 *t4
-#ifdef CFC
-      sch_11= 3579.2 - 222.63*t + 7.5749*t2 - 0.14595 *t3 + 0.0011874 *t4
-      sch_12= 3828.1 - 249.86*t + 8.7603*t2 - 0.1716  *t3 + 0.001408  *t4
-      sch_sf= 3177.5 - 200.57*t + 6.8865*t2 - 0.13335 *t3 + 0.0010877 *t4
-#endif
+      if(with_cfc) then
+         sch_11= 3579.2 - 222.63*t + 7.5749*t2 - 0.14595 *t3 + 0.0011874 *t4
+         sch_12= 3828.1 - 249.86*t + 8.7603*t2 - 0.1716  *t3 + 0.001408  *t4
+         sch_sf= 3177.5 - 200.57*t + 6.8865*t2 - 0.13335 *t3 + 0.0010877 *t4
+      endif
 #ifdef BROMO
 ! Stemmler et al. (2015; Biogeosciences) Eq. (9); Quack and Wallace
 ! (2003; GBC)
@@ -319,20 +316,20 @@
        rs=al1+al2/tk100+al3*log(tk100)+al4*tk100**2+s*(bl1+bl2*tk100+bl3*tk100**2)
        satn2o(i,j)=exp(rs)
 
-#ifdef CFC
 ! solubility of cfc11,12 (mol/(l*atm)) (Warner and Weiss 1985) and
 ! sf6 from eq. 6 of Bullister et al. (2002)
 ! These are the alpha in (1b) of the ocmpic2 howto
-      a_11 = exp(-229.9261 + 319.6552*(100/tk) + 119.4471*log(tk100)  &
-     &         -1.39165*(tk100)**2 + s*(-0.142382 + 0.091459*(tk100)  &
-     &         -0.0157274*(tk100)**2)) 
-      a_12 = exp(-218.0971 + 298.9702*(100/tk) + 113.8049*log(tk100)  &
-     &         -1.39165*(tk100)**2 + s*(-0.143566 + 0.091015*(tk100)  &
-     &         -0.0153924*(tk100)**2)) 
-      a_sf = exp(-80.0343  + 117.232 *(100/tk) +  29.5817*log(tk100)  &
-     &         +s*(0.033518-0.0373942*(tk100)+0.00774862*(tk100)**2)) 
+       if(with_cfc) then
+          a_11 = exp(-229.9261 + 319.6552*(100/tk) + 119.4471*log(tk100)  &
+     &             -1.39165*(tk100)**2 + s*(-0.142382 + 0.091459*(tk100)  &
+     &             -0.0157274*(tk100)**2))
+          a_12 = exp(-218.0971 + 298.9702*(100/tk) + 113.8049*log(tk100)  &
+     &             -1.39165*(tk100)**2 + s*(-0.143566 + 0.091015*(tk100)  &
+     &             -0.0153924*(tk100)**2))
+          a_sf = exp(-80.0343  + 117.232 *(100/tk) +  29.5817*log(tk100)  &
+     &             +s*(0.033518-0.0373942*(tk100)+0.00774862*(tk100)**2))
 ! conversion from mol/(l * atm) to kmol/(m3 * pptv) 
-      a_11 = 1e-12 * a_11 
+      a_11 = 1e-12 * a_11
       a_12 = 1e-12 * a_12
       a_sf = 1e-12 * a_sf
 #endif
@@ -348,11 +345,11 @@
        kwn2  = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5 
        kwdms = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5 
        kwn2o = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5 
-#ifdef CFC
-       kw_11 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
-       kw_12 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
-       kw_sf = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
-#endif
+       if(with_cfc) then
+          kw_11 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
+          kw_12 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
+          kw_sf = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
+       endif
 #ifdef BROMO
 ! Stemmler et al. (2015; Biogeosciences) Eq. (8) 
 !  1.e-2/3600 = conversion from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
@@ -430,7 +427,7 @@
 ! Surface flux of laughing gas (same piston velocity as for O2 and N2)
        n2oflux=kwn2o*dtbgc*(ocetra(i,j,1,ian2o)-satn2o(i,j)*atn2o*rpp0) 
        ocetra(i,j,1,ian2o)=ocetra(i,j,1,ian2o)-n2oflux/pddpo(i,j,1)
-#ifdef CFC
+
 ! Surface fluxes for CFC: eqn. (1a) in ocmip2 howto doc(hyc)
 !     flux of CFC: downward direction (mol/m**2/s)
 !      flx11=kw_11*(a_11*cfc11_atm(i,j)*ppair/p0-trc(i,j,1,1))
@@ -438,36 +435,36 @@
 !      unit should be in [kmol cfc m-2]
 !      unit of [cfc11_atm(i,j)*ppair/p0] should be in [pptv]
 !      unit of [flx11-12] is in [kmol / m2]
-
-      IF (pglat(i,j).GE.10) THEN
-       atm_cfc11=atm_cfc11_nh
-       atm_cfc12=atm_cfc12_nh
-       atm_sf6=atm_sf6_nh
-      ELSE IF (pglat(i,j).LE.-10) THEN
-       atm_cfc11=atm_cfc11_sh
-       atm_cfc12=atm_cfc12_sh
-       atm_sf6=atm_sf6_sh
-      ELSE
-       fact=(pglat(i,j)-(-10))/20.
-       atm_cfc11=fact*atm_cfc11_nh+(1-fact)*atm_cfc11_sh
-       atm_cfc12=fact*atm_cfc12_nh+(1-fact)*atm_cfc12_sh
-       atm_sf6=fact*atm_sf6_nh+(1-fact)*atm_sf6_sh
-      ENDIF
+      if(with_cfc) then
+         IF (pglat(i,j).GE.10) THEN
+            atm_cfc11=atm_cfc11_nh
+            atm_cfc12=atm_cfc12_nh
+            atm_sf6=atm_sf6_nh
+         ELSE IF (pglat(i,j).LE.-10) THEN
+            atm_cfc11=atm_cfc11_sh
+            atm_cfc12=atm_cfc12_sh
+            atm_sf6=atm_sf6_sh
+         ELSE
+            fact=(pglat(i,j)-(-10))/20.
+            atm_cfc11=fact*atm_cfc11_nh+(1-fact)*atm_cfc11_sh
+            atm_cfc12=fact*atm_cfc12_nh+(1-fact)*atm_cfc12_sh
+            atm_sf6=fact*atm_sf6_nh+(1-fact)*atm_sf6_sh
+         ENDIF
 
 ! Use conversion of 9.86923e-6 [std atm / Pascal]
 ! Surface flux of cfc11
-      flx11=kw_11*dtbgc*                                               &
-     & (a_11*atm_cfc11*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,icfc11))
-      ocetra(i,j,1,icfc11)=ocetra(i,j,1,icfc11)+flx11/pddpo(i,j,1)
+         flx11=kw_11*dtbgc*                                               &
+     &      (a_11*atm_cfc11*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,icfc11))
+         ocetra(i,j,1,icfc11)=ocetra(i,j,1,icfc11)+flx11/pddpo(i,j,1)
 ! Surface flux of cfc12
-      flx12=kw_12*dtbgc*                                               &
-     & (a_12*atm_cfc12*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,icfc12))
-      ocetra(i,j,1,icfc12)=ocetra(i,j,1,icfc12)+flx12/pddpo(i,j,1)
+         flx12=kw_12*dtbgc*                                               &
+     &      (a_12*atm_cfc12*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,icfc12))
+         ocetra(i,j,1,icfc12)=ocetra(i,j,1,icfc12)+flx12/pddpo(i,j,1)
 ! Surface flux of sf6
-      flxsf=kw_sf*dtbgc*                                               &
-     & (a_sf*atm_sf6*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,isf6))
-      ocetra(i,j,1,isf6)=ocetra(i,j,1,isf6)+flxsf/pddpo(i,j,1)
-#endif
+         flxsf=kw_sf*dtbgc*                                               &
+     &      (a_sf*atm_sf6*ppao(i,j)*9.86923*1e-6-ocetra(i,j,1,isf6))
+         ocetra(i,j,1,isf6)=ocetra(i,j,1,isf6)+flxsf/pddpo(i,j,1)
+      endif
 
 ! Surface flux of dms
        dmsflux = kwdms*dtbgc*ocetra(i,j,1,idms)  
@@ -495,11 +492,11 @@
        atmflx(i,j,iatmc13)=flux13u-flux13d
        atmflx(i,j,iatmc14)=flux14u-flux14d
 #endif
-#ifdef CFC
-       atmflx(i,j,iatmf11)=flx11
-       atmflx(i,j,iatmf12)=flx12
-       atmflx(i,j,iatmsf6)=flxsf
-#endif
+       if(with_cfc) then
+          atmflx(i,j,iatmf11)=flx11
+          atmflx(i,j,iatmf12)=flx12
+          atmflx(i,j,iatmsf6)=flxsf
+       endif
 #ifdef natDIC
        atmflx(i,j,iatmnco2)=natfluxu-natfluxd
 #endif

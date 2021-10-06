@@ -57,13 +57,13 @@
       use mod_dia,        only: ddm,depthslev,depthslev_bnds,nstepinday,pbath
       use mod_nctools,    only:ncpack,nccomp,nccopa,ncwrtr
       use netcdf,         only: nf90_fill_double
-      use mo_param1_bgc,  only: ks
-      use mo_control_bgc, only: get_bgc_namelist 
+      use mo_param1_bgc,  only: ks,with_cfc
+      use mo_control_bgc, only: get_bgc_namelist
 
       IMPLICIT NONE
 
-      PRIVATE :: ii,jj,kk,idm,jdm,kdm,nbdy,ifp,isp,ilp                
-      PUBLIC  :: ks,ddm,depthslev,depthslev_bnds
+      PRIVATE :: ii,jj,kk,idm,jdm,kdm,nbdy,ifp,isp,ilp
+      PUBLIC :: ks,ddm,depthslev,depthslev_bnds
 
 ! --- Averaging and writing frequencies for diagnostic output     
       INTEGER, SAVE :: nbgc
@@ -636,14 +636,14 @@
         IF (SRF_CO214FXU(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
         jco214fxu(n)=i_bsc_m2d*min(1,SRF_CO214FXU(n))
 #endif
-#ifdef CFC
-        IF (SRF_CFC11(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jcfc11fx(n)=i_bsc_m2d*min(1,SRF_CFC11(n))
-        IF (SRF_CFC12(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jcfc12fx(n)=i_bsc_m2d*min(1,SRF_CFC12(n))
-        IF (SRF_SF6(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jsf6fx(n)=i_bsc_m2d*min(1,SRF_SF6(n))
-#endif
+        if(with_cfc) then
+           IF (SRF_CFC11(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jcfc11fx(n)=i_bsc_m2d*min(1,SRF_CFC11(n))
+           IF (SRF_CFC12(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jcfc12fx(n)=i_bsc_m2d*min(1,SRF_CFC12(n))
+           IF (SRF_SF6(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jsf6fx(n)=i_bsc_m2d*min(1,SRF_SF6(n))
+        endif
 #ifdef natDIC
         IF (SRF_NATDIC(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
         jsrfnatdic(n)=i_bsc_m2d*min(1,SRF_NATDIC(n))
@@ -754,14 +754,14 @@
         jdicsat(n)=i_bsc_m3d*min(1,LYR_DICSAT(n))
         IF (LYR_DP(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
         jdp(n)=i_bsc_m3d*min(1,LYR_DP(n))
-#ifdef CFC
-        IF (LYR_CFC11(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jcfc11(n)=i_bsc_m3d*min(1,LYR_CFC11(n))
-        IF (LYR_CFC12(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jcfc12(n)=i_bsc_m3d*min(1,LYR_CFC12(n))
-        IF (LYR_SF6(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jsf6(n)=i_bsc_m3d*min(1,LYR_SF6(n))
-#endif
+        if(with_cfc) then
+           IF (LYR_CFC11(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jcfc11(n)=i_bsc_m3d*min(1,LYR_CFC11(n))
+           IF (LYR_CFC12(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jcfc12(n)=i_bsc_m3d*min(1,LYR_CFC12(n))
+           IF (LYR_SF6(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jsf6(n)=i_bsc_m3d*min(1,LYR_SF6(n))
+        endif
 #ifdef cisonew
         IF (LYR_DIC13(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
         jdic13(n)=i_bsc_m3d*min(1,LYR_DIC13(n))
@@ -867,14 +867,14 @@
         jlvlprefdic(n)=ilvl_bsc_m3d*min(1,LVL_PREFDIC(n))
         IF (LVL_DICSAT(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvldicsat(n)=ilvl_bsc_m3d*min(1,LVL_DICSAT(n))
-#ifdef CFC
-        IF (LVL_CFC11(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlcfc11(n)=ilvl_bsc_m3d*min(1,LVL_CFC11(n))
-        IF (LVL_CFC12(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlcfc12(n)=ilvl_bsc_m3d*min(1,LVL_CFC12(n))
-        IF (LVL_SF6(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlsf6(n)=ilvl_bsc_m3d*min(1,LVL_SF6(n))
-#endif
+        if(with_cfc) then
+           IF (LVL_CFC11(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlcfc11(n)=ilvl_bsc_m3d*min(1,LVL_CFC11(n))
+           IF (LVL_CFC12(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlcfc12(n)=ilvl_bsc_m3d*min(1,LVL_CFC12(n))
+           IF (LVL_SF6(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlsf6(n)=ilvl_bsc_m3d*min(1,LVL_SF6(n))
+        endif
 #ifdef cisonew
         IF (LVL_DIC13(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvldic13(n)=ilvl_bsc_m3d*min(1,LVL_DIC13(n))

@@ -139,7 +139,7 @@
           ocetra(i,j,k,iano3)   = ocetra(i,j,k,iano3)  /prho(i,j,k)
           ocetra(i,j,k,isilica) = ocetra(i,j,k,isilica)/prho(i,j,k)
 #ifdef cisonew
-          ! d13C based on Eide data is read in above (profile_gd)                        
+          ! d13C based on Eide data is read in above (profile_gd)
           ! Convert to 13C using model initial (ie GLODAP) total C
           ! If restarting, this is redone with model total C from restart in aufr_bgc.F90 
           beta13=ocetra(i,j,k,isco213)/1000.+1.
@@ -185,11 +185,11 @@
           ocetra(i,j,k,inos)   = snow / cellmass / (FractDim+1.)
           ocetra(i,j,k,iadust) =0. 
 #endif /*AGG*/
-#ifdef CFC
-          ocetra(i,j,k,icfc11)   =0.
-          ocetra(i,j,k,icfc12)   =0.
-          ocetra(i,j,k,isf6)     =0.
-#endif
+          if(with_cfc) then
+             ocetra(i,j,k,icfc11)   =0.
+             ocetra(i,j,k,icfc12)   =0.
+             ocetra(i,j,k,isf6)     =0.
+          endif
 #ifdef natDIC
           nathi(i,j,k)           =1.e-8
           natco3(i,j,k)          =0.
