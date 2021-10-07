@@ -495,11 +495,11 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
         ocetra(i,j,k,icalc13) = ocetra(i,j,k,icalc13)+delcar13
         ocetra(i,j,k,icalc14) = ocetra(i,j,k,icalc14)+delcar14
 #endif
-#ifdef natDIC
-        ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)-delcar+rcar*dtr
-        ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-2.*delcar-(rnit+1)*dtr
-        ocetra(i,j,k,inatcalc) = ocetra(i,j,k,inatcalc)+delcar
-#endif
+        if(with_natdic) then
+           ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)-delcar+rcar*dtr
+           ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-2.*delcar-(rnit+1)*dtr
+           ocetra(i,j,k,inatcalc) = ocetra(i,j,k,inatcalc)+delcar
+        endif
         ocetra(i,j,k,isilica) = ocetra(i,j,k,isilica)-delsil+dremopal*ocetra(i,j,k,iopal)
         ocetra(i,j,k,iopal) = ocetra(i,j,k,iopal)+delsil-dremopal*ocetra(i,j,k,iopal)
         ocetra(i,j,k,iiron) = ocetra(i,j,k,iiron)+dtr*riron                     &
@@ -672,10 +672,10 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
         ocetra(i,j,k,ioxygen) = ocetra(i,j,k,ioxygen)-ro2ut*remin
         ocetra(i,j,k,iiron) = ocetra(i,j,k,iiron)+remin*riron           &
              &             -relaxfe*MAX(ocetra(i,j,k,iiron)-fesoly,0.)
-#ifdef natDIC
-        ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)+rcar*remin
-        ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-(rnit+1)*remin
-#endif
+        if(with_natdic) then
+           ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)+rcar*remin
+           ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-(rnit+1)*remin
+        endif
 #ifdef cisonew
         ocetra(i,j,k,idet13) = ocetra(i,j,k,idet13)-pocrem13+sterph13+sterzo13
         ocetra(i,j,k,idet14) = ocetra(i,j,k,idet14)-pocrem14+sterph14+sterzo14
@@ -782,10 +782,12 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
            ocetra(i,j,k,igasnit) = ocetra(i,j,k,igasnit)+rdnit2*remin+rdn2o2*remin2o
            ocetra(i,j,k,iiron) = ocetra(i,j,k,iiron)+riron*(remin+remin2o)
            ocetra(i,j,k,ian2o) = ocetra(i,j,k,ian2o)-rdn2o1*remin2o
-#ifdef natDIC
-           ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)+(rdnit1-1)*remin-remin2o
-           ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)+rcar*(remin+remin2o)
-#endif
+           if(with_natdic) then
+              ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)              &
+                   + (rdnit1-1)*remin - remin2o
+              ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)              &
+                   + rcar*(remin+remin2o)
+           endif
 #ifdef cisonew
            ocetra(i,j,k,isco213) = ocetra(i,j,k,isco213)+rcar*rem13
            ocetra(i,j,k,isco214) = ocetra(i,j,k,isco214)+rcar*rem14
@@ -861,10 +863,10 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
            ocetra(i,j,k,iphosph) = ocetra(i,j,k,iphosph)+remin
            ocetra(i,j,k,iano3) = ocetra(i,j,k,iano3)+rnit*remin
            ocetra(i,j,k,iiron) = ocetra(i,j,k,iiron)+riron*remin
-#ifdef natDIC
-           ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-(rnit+1)*remin
-           ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)+rcar*remin
-#endif
+           if(with_natdic) then
+              ocetra(i,j,k,inatalkali) = ocetra(i,j,k,inatalkali)-(rnit+1)*remin
+              ocetra(i,j,k,inatsco212) = ocetra(i,j,k,inatsco212)+rcar*remin
+           endif
 #ifdef cisonew
            ocetra(i,j,k,idet13) = ocetra(i,j,k,idet13)-rem13
            ocetra(i,j,k,idet14) = ocetra(i,j,k,idet14)-rem14
@@ -1089,9 +1091,9 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
            if( pddpo(i,j,k) > dp_min ) then
               tco( 1) = tco( 1) + ocetra(i,j,k,idet  )*pddpo(i,j,k)
               tco( 2) = tco( 2) + ocetra(i,j,k,icalc )*pddpo(i,j,k)
-#ifdef natDIC
-              tco( 3) = tco( 3) + ocetra(i,j,k,inatcalc)*pddpo(i,j,k)
-#endif
+              if(with_natdic) then
+                 tco( 3) = tco( 3) + ocetra(i,j,k,inatcalc)*pddpo(i,j,k)
+              endif
               tco( 4) = tco( 4) + ocetra(i,j,k,iopal )*pddpo(i,j,k)
               tco( 5) = tco( 5) + ocetra(i,j,k,ifdust)*pddpo(i,j,k)
 #if defined(AGG)
@@ -1164,11 +1166,11 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
                    &	                + ocetra(i,j,kdonor,icalc14)*wcald)/      &
                    &                  (pddpo(i,j,k)+wcal)
 #endif
-#ifdef natDIC
-              ocetra(i,j,k,inatcalc) = (ocetra(i,j,k,inatcalc) * pddpo(i,j,k)   &
+              if(with_natdic) then
+                 ocetra(i,j,k,inatcalc) = (ocetra(i,j,k,inatcalc) * pddpo(i,j,k)   &
                    &	                 + ocetra(i,j,kdonor,inatcalc)*wcald)/    &
                    &                   (pddpo(i,j,k)+wcal)
-#endif
+              endif
               ocetra(i,j,k,iopal)  = (ocetra(i,j,k    ,iopal) * pddpo(i,j,k)    &
                    &                 + ocetra(i,j,kdonor,iopal)*wopald)/        &
                    &                 (pddpo(i,j,k)+wopal)
@@ -1198,9 +1200,9 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
               ocetra(i,j,k,icalc13) = ocetra(i,j,kdonor,icalc13)
               ocetra(i,j,k,icalc14) = ocetra(i,j,kdonor,icalc14)
 #endif
-#ifdef natDIC
-              ocetra(i,j,k,inatcalc) = ocetra(i,j,kdonor,inatcalc)
-#endif
+              if(with_natdic) then
+                 ocetra(i,j,k,inatcalc) = ocetra(i,j,kdonor,inatcalc)
+              endif
               ocetra(i,j,k,iopal)  = ocetra(i,j,kdonor,iopal)
               ocetra(i,j,k,ifdust) = ocetra(i,j,kdonor,ifdust)
 #ifdef AGG
@@ -1216,9 +1218,9 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
            if( pddpo(i,j,k) > dp_min ) then
               tcn( 1) = tcn( 1) + ocetra(i,j,k,idet  )*pddpo(i,j,k)
               tcn( 2) = tcn( 2) + ocetra(i,j,k,icalc )*pddpo(i,j,k)
-#ifdef natDIC
-              tcn( 3) = tcn( 3) + ocetra(i,j,k,inatcalc)*pddpo(i,j,k)
-#endif
+              if(with_natdic) then
+                 tcn( 3) = tcn( 3) + ocetra(i,j,k,inatcalc)*pddpo(i,j,k)
+              endif
               tcn( 4) = tcn( 4) + ocetra(i,j,k,iopal )*pddpo(i,j,k)
               tcn( 5) = tcn( 5) + ocetra(i,j,k,ifdust)*pddpo(i,j,k)
 #if defined(AGG)
@@ -1240,9 +1242,9 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
         ! Add fluxes to sediment to new total column inventory
         tcn( 1) = tcn( 1) + ocetra(i,j,kdonor,idet  )*wpoc
         tcn( 2) = tcn( 2) + ocetra(i,j,kdonor,icalc )*wcal
-#ifdef natDIC
-        tcn( 3) = tcn( 3) + ocetra(i,j,kdonor,inatcalc)*wcal
-#endif
+        if(with_natdic) then
+           tcn( 3) = tcn( 3) + ocetra(i,j,kdonor,inatcalc)*wcal
+        endif
         tcn( 4) = tcn( 4) + ocetra(i,j,kdonor,iopal )*wopal
         tcn( 5) = tcn( 5) + ocetra(i,j,kdonor,ifdust)*wdust
 #if defined(AGG)
@@ -1266,9 +1268,9 @@ subroutine ocprod(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,omask,dust,ptho, &
            if( pddpo(i,j,k) > dp_min ) then
               ocetra(i,j,k,idet  ) = ocetra(i,j,k,idet  )*q(1)
               ocetra(i,j,k,icalc ) = ocetra(i,j,k,icalc )*q(2)
-#ifdef natDIC
-              ocetra(i,j,k,inatcalc) = ocetra(i,j,k,inatcalc)*q(3)
-#endif
+              if(with_natdic) then
+                 ocetra(i,j,k,inatcalc) = ocetra(i,j,k,inatcalc)*q(3)
+              endif
               ocetra(i,j,k,iopal ) = ocetra(i,j,k,iopal )*q(4)
               ocetra(i,j,k,ifdust) = ocetra(i,j,k,ifdust)*q(5)
 #if defined(AGG)

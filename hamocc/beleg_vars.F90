@@ -190,11 +190,11 @@
              ocetra(i,j,k,icfc12)   =0.
              ocetra(i,j,k,isf6)     =0.
           endif
-#ifdef natDIC
-          nathi(i,j,k)           =1.e-8
-          natco3(i,j,k)          =0.
-          ocetra(i,j,k,inatcalc) =0. 
-#endif
+          if(with_natdic) then
+             nathi(i,j,k)           =1.e-8
+             natco3(i,j,k)          =0.
+             ocetra(i,j,k,inatcalc) =0.
+          endif
 #ifdef cisonew
           rco213=ocetra(i,j,k,isco213)/(ocetra(i,j,k,isco212)+safediv)
           rco214=ocetra(i,j,k,isco214)/(ocetra(i,j,k,isco212)+safediv)

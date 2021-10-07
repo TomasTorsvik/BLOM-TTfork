@@ -83,14 +83,14 @@
       REAL, DIMENSION (:,:),     ALLOCATABLE :: co214fxu
 #endif
       REAL :: dmspar(6)
-#ifdef natDIC
+      !--- natDIC
       REAL                                   :: atm_co2_nat
       REAL, DIMENSION (:,:),     ALLOCATABLE :: natpco2d
       REAL, DIMENSION (:,:,:),   ALLOCATABLE :: nathi
       REAL, DIMENSION (:,:,:),   ALLOCATABLE :: natco3
       REAL, DIMENSION (:,:,:),   ALLOCATABLE :: natOmegaA
       REAL, DIMENSION (:,:,:),   ALLOCATABLE :: natOmegaC
-#endif
+      !---
       REAL :: atm_co2, atm_o2, atm_n2 
       REAL :: atm_c13, atm_c14  
 #ifdef cisonew
@@ -111,7 +111,7 @@
 !******************************************************************************
       use mod_xc,         only: mnproc
       use mo_control_bgc, only: io_stdo_bgc
-      use mo_param1_bgc,  only: nocetra,npowtra,natm
+      use mo_param1_bgc,  only: nocetra,npowtra,natm,with_natdic
 
       INTEGER, intent(in) :: kpie,kpje,kpke
       INTEGER             :: errstat
@@ -184,7 +184,7 @@
       OmegaA(:,:,:) = 0.0
       OmegaC(:,:,:) = 0.0
 
-#ifdef natDIC
+      if(with_natdic) then
       IF (mnproc.eq.1) THEN
       WRITE(io_stdo_bgc,*)'Memory allocation for variable natpco2d ...'
       WRITE(io_stdo_bgc,*)'First dimension    : ',kpie
@@ -229,7 +229,7 @@
       if(errstat.ne.0) stop 'not enough memory natOmegaA, natOmegaC'
       natOmegaA(:,:,:) = 0.0
       natOmegaC(:,:,:) = 0.0
-#endif
+      endif  !-- (with_natdic)
 
       IF (mnproc.eq.1) THEN
       WRITE(io_stdo_bgc,*)'Memory allocation for variable sedfluxo ..'

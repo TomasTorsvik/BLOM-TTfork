@@ -153,11 +153,11 @@
       REAL    :: atm_cfc11,atm_cfc12,atm_sf6,fact
       REAL    :: sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf
       REAL    :: flx11,flx12,flxsf,a_11,a_12,a_sf
-#ifdef natDIC
+      !--- natDIC variables
       REAL    :: natcu,natcb,natcc
       REAL    :: natpco2,natfluxd,natfluxu,natomega
       REAL    :: natsupsat,natundsa,natdissol
-#endif
+      !---
 #ifdef cisonew
       REAL    :: rco213,rco214
       REAL    :: dissol13,dissol14
@@ -186,12 +186,12 @@
        satoxy (:,:,:)=0.
        omegaA (:,:,:)=0.
        omegaC (:,:,:)=0.
-#ifdef natDIC
-       natpco2d   (:,:)=0. 
-       natco3   (:,:,:)=0.
-       natomegaA(:,:,:)=0.
-       natomegaC(:,:,:)=0.
-#endif
+       if(with_natdic) then
+          natpco2d   (:,:)=0.
+          natco3   (:,:,:)=0.
+          natomegaA(:,:,:)=0.
+          natomegaC(:,:,:)=0.
+       endif
 
 !$OMP PARALLEL DO PRIVATE(t,t2,t3,t4,tk,tk100,s,rs,prb,Kh,Khd,K1,K2   &
 !$OMP  ,Kb,K1p,K2p,K3p,Ksi,Kw,Ks1,Kf,Kspc,Kspa,tc,ta,sit,pt,ah1,ac    &
@@ -200,7 +200,6 @@
 !$OMP  ,niflux,n2oflux,dmsflux,omega,supsat,undsa,dissol              &
 !$OMP  ,sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf,a_11,a_12,a_sf,flx11   &
 !$OMP  ,flx12,flxsf,atm_cfc11,atm_cfc12,atm_sf6                       &
-#ifdef natDIC
 !$OMP  ,natcu,natcb,natcc,natpco2,natfluxd,natfluxu,natomega          &
 !$OMP  ,natsupsat,natundsa,natdissol                                  &
 #endif
@@ -255,25 +254,25 @@
 ! Carbonate ion concentration, convert from mol/kg to kmol/m^3 
       co3(i,j,k)  = cc * rrho 
 
-#ifdef natDIC
-      tc   = ocetra(i,j,k,inatsco212) / rrho  ! convert to mol/kg
-      ta   = ocetra(i,j,k,inatalkali) / rrho
-      ah1  = nathi(i,j,k)
+      if(with_natdic) then
+         tc   = ocetra(i,j,k,inatsco212) / rrho  ! convert to mol/kg
+         ta   = ocetra(i,j,k,inatalkali) / rrho
+         ah1  = nathi(i,j,k)
 
-      CALL CARCHM_SOLVE(s,tc,ta,sit,pt,K1,K2,Kb,Kw,Ks1,Kf,Ksi,K1p,K2p,K3p, &
-                        ah1,ac,niter)
+         CALL CARCHM_SOLVE(s,tc,ta,sit,pt,K1,K2,Kb,Kw,Ks1,Kf,Ksi,K1p,K2p,K3p, &
+              ah1,ac,niter)
 
-      if(ah1.gt.0.) then 
-        nathi(i,j,k)=max(1.e-20,ah1)
-      endif
+         if(ah1.gt.0.) then
+            nathi(i,j,k)=max(1.e-20,ah1)
+         endif
 
 ! Determine natural CO2*, HCO3- and CO3-- concentrations (in mol/kg soln)
-      natcu = ( 2. * tc - ac ) / ( 2. + K1 / ah1 )
-      natcb = K1 * natcu / ah1
-      natcc = K2 * natcb / ah1
+         natcu = ( 2. * tc - ac ) / ( 2. + K1 / ah1 )
+         natcb = K1 * natcu / ah1
+         natcc = K2 * natcb / ah1
 ! Natural carbonate ion concentration, convert from mol/kg to kmol/m^3 
-      natco3(i,j,k) = natcc * rrho
-#endif
+         natco3(i,j,k) = natcc * rrho
+      endif
 
 ! solubility of O2 (Weiss, R.F. 1970, Deep-Sea Res., 17, 721-735) for moist air
 ! at 1 atm; multiplication with oxyco converts to kmol/m^3/atm
@@ -284,9 +283,9 @@
 ! Determine CO2 pressure and fugacity (in micoatm)
 ! NOTE: equation below for pCO2 needs requires CO2 in mol/kg
       pco2 = cu * 1.e6 / Kh
-#ifdef natDIC
-      natpco2 = natcu * 1.e6 / Kh
-#endif
+      if(with_natdic) then
+         natpco2 = natcu * 1.e6 / Kh
+      endif
 
 
 ! Schmidt numbers according to Wanninkhof (2014), Table 1
@@ -377,11 +376,12 @@
        fluxu=pco2      *kwco2*dtbgc*Kh*1e-6*rrho ! to get fluxes in kmol/m^2      
 !JT set limit for CO2 outgassing to avoid negative DIC concentration, set minimum DIC concentration to 1e-5 kmol/m3 
        fluxu=min(fluxu,fluxd-(1e-5 - ocetra(i,j,k,isco212))*pddpo(i,j,1))
-#ifdef natDIC
-       natfluxd=atm_co2_nat*rpp0*kwco2*dtbgc*Kh*1e-6*rrho
-       natfluxu=natpco2         *kwco2*dtbgc*Kh*1e-6*rrho 
-       natfluxu=min(natfluxu,natfluxd-(1e-5 - ocetra(i,j,k,inatsco212))*pddpo(i,j,1))
-#endif
+       if(with_natdic) then
+          natfluxd=atm_co2_nat*rpp0*kwco2*dtbgc*Kh*1e-6*rrho
+          natfluxu=natpco2         *kwco2*dtbgc*Kh*1e-6*rrho
+          natfluxu=min(natfluxu,                                              &
+               natfluxd-(1e-5 - ocetra(i,j,k,inatsco212))*pddpo(i,j,1))
+       endif
 
 ! Calculate saturation DIC concentration in mixed layer
        ta = ocetra(i,j,k,ialkali) / rrho
@@ -410,9 +410,10 @@
 
 ! Update DIC
        ocetra(i,j,1,isco212)=ocetra(i,j,1,isco212)+(fluxd-fluxu)/pddpo(i,j,1)
-#ifdef natDIC
-       ocetra(i,j,1,inatsco212)=ocetra(i,j,1,inatsco212)+(natfluxd-natfluxu)/pddpo(i,j,1)
-#endif
+       if(with_natdic) then
+          ocetra(i,j,1,inatsco212)=ocetra(i,j,1,inatsco212)                   &
+               + (natfluxd-natfluxu)/pddpo(i,j,1)
+       endif
 #ifdef cisonew
        ocetra(i,j,1,isco213)=ocetra(i,j,1,isco213)+(flux13d-flux13u)/pddpo(i,j,1)
        ocetra(i,j,1,isco214)=ocetra(i,j,1,isco214)+(flux14d-flux14u)/pddpo(i,j,1)
@@ -497,9 +498,9 @@
           atmflx(i,j,iatmf12)=flx12
           atmflx(i,j,iatmsf6)=flxsf
        endif
-#ifdef natDIC
-       atmflx(i,j,iatmnco2)=natfluxu-natfluxd
-#endif
+       if(with_natdic) then
+          atmflx(i,j,iatmnco2)=natfluxu-natfluxd
+       endif
 #ifdef BROMO
        atmflx(i,j,iatmbromo)=-flx_bromo
 #endif
@@ -516,9 +517,9 @@
 
 ! Save pco2 w.r.t. dry air for output
        pco2d(i,j) = cu * 1.e6 / Khd
-#ifdef natDIC
-       natpco2d(i,j) = natcu * 1.e6 / Khd
-#endif
+       if(with_natdic) then
+          natpco2d(i,j) = natcu * 1.e6 / Khd
+       endif
 
 ! Save product of piston velocity and solubility for output
        kwco2sol(i,j) = kwco2*Kh*1e-6
@@ -547,14 +548,14 @@
       supsat=co3(i,j,k)-co3(i,j,k)/OmegaC(i,j,k)
       undsa=MAX(0.,-supsat)
       dissol=MIN(undsa,0.05*ocetra(i,j,k,icalc))
-#ifdef natDIC
-      natomega = ( calcon * s / 35. ) * natcc
-      natOmegaA(i,j,k) = natomega / Kspa
-      natOmegaC(i,j,k) = natomega / Kspc
-      natsupsat=natco3(i,j,k)-natco3(i,j,k)/natOmegaC(i,j,k)
-      natundsa=MAX(0.,-natsupsat)
-      natdissol=MIN(natundsa,0.05*ocetra(i,j,k,inatcalc))
-#endif
+      if(with_natdic) then
+         natomega = ( calcon * s / 35. ) * natcc
+         natOmegaA(i,j,k) = natomega / Kspa
+         natOmegaC(i,j,k) = natomega / Kspc
+         natsupsat=natco3(i,j,k)-natco3(i,j,k)/natOmegaC(i,j,k)
+         natundsa=MAX(0.,-natsupsat)
+         natdissol=MIN(natundsa,0.05*ocetra(i,j,k,inatcalc))
+      endif
 #ifdef cisonew
       dissol13=dissol*ocetra(i,j,k,icalc13)/(ocetra(i,j,k,icalc)+safediv)
       dissol14=dissol*ocetra(i,j,k,icalc14)/(ocetra(i,j,k,icalc)+safediv)
@@ -562,11 +563,11 @@
       ocetra(i,j,k,icalc)=ocetra(i,j,k,icalc)-dissol
       ocetra(i,j,k,ialkali)=ocetra(i,j,k,ialkali)+2.*dissol
       ocetra(i,j,k,isco212)=ocetra(i,j,k,isco212)+dissol
-#ifdef natDIC
-      ocetra(i,j,k,inatcalc)=ocetra(i,j,k,inatcalc)-natdissol
-      ocetra(i,j,k,inatalkali)=ocetra(i,j,k,inatalkali)+2.*natdissol
-      ocetra(i,j,k,inatsco212)=ocetra(i,j,k,inatsco212)+natdissol
-#endif
+      if(with_natdic) then
+         ocetra(i,j,k,inatcalc)=ocetra(i,j,k,inatcalc)-natdissol
+         ocetra(i,j,k,inatalkali)=ocetra(i,j,k,inatalkali)+2.*natdissol
+         ocetra(i,j,k,inatsco212)=ocetra(i,j,k,inatsco212)+natdissol
+      endif
 #ifdef cisonew
       ocetra(i,j,k,icalc13)=ocetra(i,j,k,icalc13)-dissol13
       ocetra(i,j,k,isco213)=ocetra(i,j,k,isco213)+dissol13

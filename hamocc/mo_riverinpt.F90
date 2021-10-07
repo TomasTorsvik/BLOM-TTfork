@@ -255,7 +255,8 @@ subroutine riverinpt(kpie,kpje,kpke,pddpo,omask,rivin)
 !  *REAL*      *rivin*   - riverine input field [kmol m-2 yr-1]
 !
 !--------------------------------------------------------------------------------
-  use mo_param1_bgc,  only: iano3,iphosph,isilica,isco212,iiron,idoc,idet,ialkali,inatsco212,inatalkali
+  use mo_param1_bgc,  only: iano3,iphosph,isilica,isco212,iiron,idoc,idet,      &
+                            ialkali,inatsco212,inatalkali,with_natdic
   use mo_control_bgc, only: dtb,do_rivinpt
   use mo_vgrid,       only: kmle
   use mo_carbch,      only: ocetra
@@ -301,12 +302,13 @@ subroutine riverinpt(kpie,kpje,kpke,pddpo,omask,rivin)
                                                                     + rivin(i,j,irdin)*fdt/volij  &
                                                                     + rivin(i,j,irdip)*fdt/volij
       ocetra(i,j,1:kmle,ialkali)    = ocetra(i,j,1:kmle,ialkali)    + rivin(i,j,iralk)*fdt/volij
-#ifdef natDIC
-      ocetra(i,j,1:kmle,inatsco212) = ocetra(i,j,1:kmle,inatsco212) + rivin(i,j,iralk)*fdt/volij  &
-                                                                    + rivin(i,j,irdin)*fdt/volij  &
-                                                                    + rivin(i,j,irdip)*fdt/volij
-      ocetra(i,j,1:kmle,inatalkali) = ocetra(i,j,1:kmle,inatalkali) + rivin(i,j,iralk)*fdt/volij
-#endif
+      if(with_natdic) then
+         ocetra(i,j,1:kmle,inatsco212) = ocetra(i,j,1:kmle,inatsco212)         &
+              + rivin(i,j,iralk)*fdt/volij + rivin(i,j,irdin)*fdt/volij        &
+              + rivin(i,j,irdip)*fdt/volij
+         ocetra(i,j,1:kmle,inatalkali) = ocetra(i,j,1:kmle,inatalkali)         &
+              + rivin(i,j,iralk)*fdt/volij
+      endif
       ocetra(i,j,1:kmle,iiron)      = ocetra(i,j,1:kmle,iiron)      + rivin(i,j,iriron)*fdt/volij*0.01
       ocetra(i,j,1:kmle,idoc)       = ocetra(i,j,1:kmle,idoc)       + rivin(i,j,irdoc)*fdt/volij
       ocetra(i,j,1:kmle,idet)       = ocetra(i,j,1:kmle,idet)       + rivin(i,j,irdet)*fdt/volij

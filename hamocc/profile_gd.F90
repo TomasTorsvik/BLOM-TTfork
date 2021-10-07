@@ -82,12 +82,12 @@ nflds = nread_base
 vname( 1:nflds) = (/ 'dic',  'alk',  'pho',  'nit','sil',  'oxy'  /)
  ifld( 1:nflds) = (/ isco212,ialkali,iphosph,iano3,isilica,ioxygen/)
 
-#ifdef natDIC
-no    = nflds+1
-nflds = nflds+nread_ndic
-vname(no:nflds) = (/'dic',     'alk'/)
- ifld(no:nflds) = (/inatsco212,inatalkali/)
-#endif
+if(with_natdic) then
+   no    = nflds+1
+   nflds = nflds+nread_ndic
+   vname(no:nflds) = (/'dic',     'alk'/)
+   ifld(no:nflds)  = (/inatsco212,inatalkali/)
+endif
 
 #ifdef cisonew
 no    = nflds+1

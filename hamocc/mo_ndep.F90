@@ -258,7 +258,7 @@ subroutine n_deposition(kpie,kpje,kpke,pddpo,omask,ndep)
   use mod_xc,         only: mnproc
   use mo_control_bgc, only: io_stdo_bgc,dtb,do_ndep
   use mo_carbch,      only: ocetra,ndepflx
-  use mo_param1_bgc,  only: iano3,ialkali,inatalkali
+  use mo_param1_bgc,  only: iano3,ialkali,inatalkali,with_natdic
 
   implicit none
 
@@ -280,9 +280,10 @@ subroutine n_deposition(kpie,kpje,kpke,pddpo,omask,ndep)
       ndepflx(i,j) = ndep(i,j)*dtb/365.
       ocetra(i,j,1,iano3)=ocetra(i,j,1,iano3)+ndepflx(i,j)/pddpo(i,j,1)
       ocetra(i,j,1,ialkali)=ocetra(i,j,1,ialkali)-ndepflx(i,j)/pddpo(i,j,1)
-#ifdef natDIC
-      ocetra(i,j,1,inatalkali)=ocetra(i,j,1,inatalkali)-ndepflx(i,j)/pddpo(i,j,1)
-#endif
+      if(with_natdic) then
+         ocetra(i,j,1,inatalkali)=ocetra(i,j,1,inatalkali)                     &
+              - ndepflx(i,j)/pddpo(i,j,1)
+      endif
     endif
   enddo
   enddo

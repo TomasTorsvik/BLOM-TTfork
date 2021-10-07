@@ -563,17 +563,19 @@
      &       6,'mol/kg',4,'SF-6',                                       &
      &       rmissing,49,io_stdo_bgc)
       endif
-#ifdef natDIC
-      CALL NETCDF_DEF_VARDB(ncid,9,'natsco212',3,ncdimst,ncvarid,       &
-     &   6,'mol/kg',21, 'Natural dissolved CO2',rmissing,50,io_stdo_bgc)
+      if(with_natdic) then
+         CALL NETCDF_DEF_VARDB(ncid,9,'natsco212',3,ncdimst,ncvarid,    &
+              &       6,'mol/kg',21, 'Natural dissolved CO2',                    &
+              &       rmissing,50,io_stdo_bgc)
 
-      CALL NETCDF_DEF_VARDB(ncid,9,'natalkali',3,ncdimst,ncvarid,       &
-     &    6,'mol/kg',18,'Natural alkalinity',rmissing,51,io_stdo_bgc)
+         CALL NETCDF_DEF_VARDB(ncid,9,'natalkali',3,ncdimst,ncvarid,    &
+              &       6,'mol/kg',18,'Natural alkalinity',                        &
+              &       rmissing,51,io_stdo_bgc)
 
-      CALL NETCDF_DEF_VARDB(ncid,9,'natcalciu',3,ncdimst,ncvarid,       &
-     &    6,'mol/kg',25,'Natural calcium carbonate',                    &
-     &    rmissing,52,io_stdo_bgc)
-#endif
+         CALL NETCDF_DEF_VARDB(ncid,9,'natcalciu',3,ncdimst,ncvarid,    &
+              &       6,'mol/kg',25,'Natural calcium carbonate',                 &
+              &       rmissing,52,io_stdo_bgc)
+      endif
 #ifdef BROMO
       CALL NETCDF_DEF_VARDB(ncid,5,'bromo',3,ncdimst,ncvarid,           &
      &    6,'mol/kg',9,'Bromoform',rmissing,47,io_stdo_bgc)
@@ -606,11 +608,11 @@
      &    9,'xxxxxxxxx',9 ,'xxxxxxxxx',  &
      &    rmissing,63,io_stdo_bgc)
 
-#ifdef natDIC
-      CALL NETCDF_DEF_VARDB(ncid,5,'nathi',3,ncdimst,ncvarid,           &
-     &    6,'mol/kg',34,'Natural hydrogen ion concentration',           &
-     &    rmissing,64,io_stdo_bgc)
-#endif
+      if(with_natdic) then
+         CALL NETCDF_DEF_VARDB(ncid,5,'nathi',3,ncdimst,ncvarid,        &
+     &       6,'mol/kg',34,'Natural hydrogen ion concentration',        &
+     &       rmissing,64,io_stdo_bgc)
+      endif
 
 
 !
@@ -767,11 +769,11 @@
      &    3,'ppm',17,'atmospheric 14CO2',                               &
      &    rmissing,105,io_stdo_bgc)      
 #endif
-#ifdef natDIC
-      CALL NETCDF_DEF_VARDB(ncid,7,'atmnco2',3,ncdimst,ncvarid,         &
-     &    3,'ppm',23,'natural atmospheric CO2',                         &
-     &    rmissing,106,io_stdo_bgc)      
-#endif
+      if(with_natdic) then
+         CALL NETCDF_DEF_VARDB(ncid,7,'atmnco2',3,ncdimst,ncvarid,      &
+     &       3,'ppm',23,'natural atmospheric CO2',                      &
+     &       rmissing,106,io_stdo_bgc)
+      endif
 #endif
       IF(mnproc==1 .AND. IOTYPE==0) THEN
       ncstat = NF90_ENDDEF(ncid)
@@ -853,15 +855,14 @@
          CALL write_netcdf_var(ncid,'cfc12',locetra(1,1,1,icfc12),2*kpke,0)
          CALL write_netcdf_var(ncid,'sf6',locetra(1,1,1,isf6),2*kpke,0)
       endif
-#ifdef natDIC
-      CALL write_netcdf_var(ncid,'natsco212',locetra(1,1,1,inatsco212),2*kpke,0)
-      CALL write_netcdf_var(ncid,'natalkali',locetra(1,1,1,inatalkali),2*kpke,0)
-      CALL write_netcdf_var(ncid,'natcalciu',locetra(1,1,1,inatcalc),2*kpke,0)
-#endif
+      if(with_natdic) then
+         CALL write_netcdf_var(ncid,'natsco212',locetra(1,1,1,inatsco212),2*kpke,0)
+         CALL write_netcdf_var(ncid,'natalkali',locetra(1,1,1,inatalkali),2*kpke,0)
+         CALL write_netcdf_var(ncid,'natcalciu',locetra(1,1,1,inatcalc),2*kpke,0)
+      endif
 #ifdef BROMO
       CALL write_netcdf_var(ncid,'bromo',locetra(1,1,1,ibromo),2*kpke,0)
 #endif
-
 !
 ! Write restart data : diagtnostic ocean fields
 !
@@ -869,9 +870,9 @@
       CALL write_netcdf_var(ncid,'co3',co3(1,1,1),kpke,0)
       CALL write_netcdf_var(ncid,'co2star',co2star(1,1,1),kpke,0)
       CALL write_netcdf_var(ncid,'satoxy',satoxy(1,1,1),kpke,0)
-#ifdef natDIC
-      CALL write_netcdf_var(ncid,'nathi',nathi(1,1,1),kpke,0)
-#endif
+      if(with_natdic) then
+         CALL write_netcdf_var(ncid,'nathi',nathi(1,1,1),kpke,0)
+      endif
 !
 ! Write restart data : sediment variables.
 !
@@ -912,9 +913,9 @@
       CALL write_netcdf_var(ncid,'atmc13',atm2(1,1,1,iatmc13),2,0)
       CALL write_netcdf_var(ncid,'atmc14',atm2(1,1,1,iatmc14),2,0)
 #endif
-#ifdef natDIC
-      CALL write_netcdf_var(ncid,'atmnco2',atm2(1,1,1,iatmnco2),2,0)
-#endif
+      if(with_natdic) then
+         CALL write_netcdf_var(ncid,'atmnco2',atm2(1,1,1,iatmnco2),2,0)
+      endif
 #endif
 
 

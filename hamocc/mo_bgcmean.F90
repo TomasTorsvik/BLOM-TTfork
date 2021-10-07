@@ -57,7 +57,7 @@
       use mod_dia,        only: ddm,depthslev,depthslev_bnds,nstepinday,pbath
       use mod_nctools,    only:ncpack,nccomp,nccopa,ncwrtr
       use netcdf,         only: nf90_fill_double
-      use mo_param1_bgc,  only: ks,with_cfc
+      use mo_param1_bgc,  only: ks,with_cfc,with_natdic
       use mo_control_bgc, only: get_bgc_namelist
 
       IMPLICIT NONE
@@ -401,7 +401,7 @@
      &          jlvldoc13  = 0 ,                                        &
      &          jlvlcalc13 = 0 ,                                        &
      &          jlvlphyto13 = 0,                                        &
-     &          jlvlgrazer13= 0                                                                                        
+     &          jlvlgrazer13= 0
 
       INTEGER, DIMENSION(nbgcmax), SAVE ::                              &
      &          jnos       = 0 ,                                        &
@@ -644,17 +644,17 @@
            IF (SRF_SF6(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
            jsf6fx(n)=i_bsc_m2d*min(1,SRF_SF6(n))
         endif
-#ifdef natDIC
-        IF (SRF_NATDIC(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jsrfnatdic(n)=i_bsc_m2d*min(1,SRF_NATDIC(n))
-        IF (SRF_NATALKALI(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jsrfnatalk(n)=i_bsc_m2d*min(1,SRF_NATALKALI(n))
-        IF (SRF_NATPCO2(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jnatpco2(n)=i_bsc_m2d*min(1,SRF_NATPCO2(n))
-        IF (SRF_NATCO2FX(n).GT.0) i_bsc_m2d=i_bsc_m2d+1 
-        jnatco2fx(n)=i_bsc_m2d*min(1,SRF_NATCO2FX(n))
-#endif
-#ifdef BROMO 
+        if(with_natdic) then
+           IF (SRF_NATDIC(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jsrfnatdic(n)=i_bsc_m2d*min(1,SRF_NATDIC(n))
+           IF (SRF_NATALKALI(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jsrfnatalk(n)=i_bsc_m2d*min(1,SRF_NATALKALI(n))
+           IF (SRF_NATPCO2(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jnatpco2(n)=i_bsc_m2d*min(1,SRF_NATPCO2(n))
+           IF (SRF_NATCO2FX(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
+           jnatco2fx(n)=i_bsc_m2d*min(1,SRF_NATCO2FX(n))
+        endif
+#ifdef BROMO
         IF (SRF_BROMO(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
         jsrfbromo(n)=i_bsc_m2d*min(1,SRF_BROMO(n))
         IF (SRF_BROMOFX(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
@@ -664,7 +664,7 @@
         IF (INT_BROMOUV(n).GT.0) i_bsc_m2d=i_bsc_m2d+1
         jbromo_uv(n)=i_bsc_m2d*min(1,INT_BROMOUV(n))
 #endif
-      ENDDO 
+      ENDDO
 
       domassfluxes = any(                                    &
         jcarflx0100+jcarflx0500+jcarflx1000+                 &
@@ -796,22 +796,22 @@
         IF (LYR_ASIZE(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
         jasize(n)=i_bsc_m3d*min(1,LYR_ASIZE(n))
 #endif
-#ifdef natDIC
-        IF (LYR_NATCO3(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatco3(n)=i_bsc_m3d*min(1,LYR_NATCO3(n))
-        IF (LYR_NATALKALI(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatalkali(n)=i_bsc_m3d*min(1,LYR_NATALKALI(n))
-        IF (LYR_NATDIC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatdic(n)=i_bsc_m3d*min(1,LYR_NATDIC(n))
-        IF (LYR_NATCALC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatcalc(n)=i_bsc_m3d*min(1,LYR_NATCALC(n))
-        IF (LYR_NATPH(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatph(n)=i_bsc_m3d*min(1,LYR_NATPH(n))
-        IF (LYR_NATOMEGAA(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatomegaa(n)=i_bsc_m3d*min(1,LYR_NATOMEGAA(n))
-        IF (LYR_NATOMEGAC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
-        jnatomegac(n)=i_bsc_m3d*min(1,LYR_NATOMEGAC(n))
-#endif
+        if(with_natdic) then
+           IF (LYR_NATCO3(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatco3(n)=i_bsc_m3d*min(1,LYR_NATCO3(n))
+           IF (LYR_NATALKALI(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatalkali(n)=i_bsc_m3d*min(1,LYR_NATALKALI(n))
+           IF (LYR_NATDIC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatdic(n)=i_bsc_m3d*min(1,LYR_NATDIC(n))
+           IF (LYR_NATCALC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatcalc(n)=i_bsc_m3d*min(1,LYR_NATCALC(n))
+           IF (LYR_NATPH(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatph(n)=i_bsc_m3d*min(1,LYR_NATPH(n))
+           IF (LYR_NATOMEGAA(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatomegaa(n)=i_bsc_m3d*min(1,LYR_NATOMEGAA(n))
+           IF (LYR_NATOMEGAC(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
+           jnatomegac(n)=i_bsc_m3d*min(1,LYR_NATOMEGAC(n))
+        endif
 #ifdef BROMO
         IF (LYR_BROMO(n).GT.0) i_bsc_m3d=i_bsc_m3d+1
         jbromo(n)=i_bsc_m3d*min(1,LYR_BROMO(n))
@@ -909,22 +909,22 @@
         IF (LVL_ASIZE(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvlasize(n)=ilvl_bsc_m3d*min(1,LVL_ASIZE(n))
 #endif
-#ifdef natDIC
-        IF (LVL_NATCO3(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatco3(n)=ilvl_bsc_m3d*min(1,LVL_NATCO3(n))
-        IF (LVL_NATALKALI(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatalkali(n)=ilvl_bsc_m3d*min(1,LVL_NATALKALI(n))
-        IF (LVL_NATDIC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatdic(n)=ilvl_bsc_m3d*min(1,LVL_NATDIC(n))
-        IF (LVL_NATCALC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatcalc(n)=ilvl_bsc_m3d*min(1,LVL_NATCALC(n))
-        IF (LVL_NATPH(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatph(n)=ilvl_bsc_m3d*min(1,LVL_NATPH(n))
-        IF (LVL_NATOMEGAA(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatomegaa(n)=ilvl_bsc_m3d*min(1,LVL_NATOMEGAA(n))
-        IF (LVL_NATOMEGAC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
-        jlvlnatomegac(n)=ilvl_bsc_m3d*min(1,LVL_NATOMEGAC(n))
-#endif
+        if(with_natdic) then
+           IF (LVL_NATCO3(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatco3(n)=ilvl_bsc_m3d*min(1,LVL_NATCO3(n))
+           IF (LVL_NATALKALI(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatalkali(n)=ilvl_bsc_m3d*min(1,LVL_NATALKALI(n))
+           IF (LVL_NATDIC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatdic(n)=ilvl_bsc_m3d*min(1,LVL_NATDIC(n))
+           IF (LVL_NATCALC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatcalc(n)=ilvl_bsc_m3d*min(1,LVL_NATCALC(n))
+           IF (LVL_NATPH(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatph(n)=ilvl_bsc_m3d*min(1,LVL_NATPH(n))
+           IF (LVL_NATOMEGAA(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatomegaa(n)=ilvl_bsc_m3d*min(1,LVL_NATOMEGAA(n))
+           IF (LVL_NATOMEGAC(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
+           jlvlnatomegac(n)=ilvl_bsc_m3d*min(1,LVL_NATOMEGAC(n))
+        endif
 #ifdef BROMO
         IF (LVL_BROMO(n).GT.0) ilvl_bsc_m3d=ilvl_bsc_m3d+1
         jlvlbromo(n)=ilvl_bsc_m3d*min(1,LVL_BROMO(n))

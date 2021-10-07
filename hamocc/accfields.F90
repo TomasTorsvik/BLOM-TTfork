@@ -186,9 +186,9 @@
          call accsrf(jcfc12fx,atmflx(1,1,iatmf12),omask,0)
          call accsrf(jsf6fx,atmflx(1,1,iatmsf6),omask,0)
       endif
-#ifdef natDIC
-      call accsrf(jnatco2fx,atmflx(1,1,iatmnco2),omask,0)
-#endif
+      if(with_natdic) then
+         call accsrf(jnatco2fx,atmflx(1,1,iatmnco2),omask,0)
+      endif
 #ifdef BROMO
       call accsrf(jatmbromo,atm(1,1,iatmbromo),omask,0)
       call accsrf(jbromofx,atmflx(1,1,iatmbromo),omask,0)
@@ -229,15 +229,15 @@
       call accsrf(jintphosy,intphosy,omask,0)     
       call accsrf(jintdnit,intdnit,omask,0)
       call accsrf(jintnfix,intnfix,omask,0)
-#ifdef natDIC
-      call accsrf(jsrfnatdic,ocetra(1,1,1,inatsco212),omask,0)
-      call accsrf(jsrfnatalk,ocetra(1,1,1,inatalkali),omask,0)
-      call accsrf(jnatpco2,natpco2d,omask,0)
-#endif
+      if(with_natdic) then
+         call accsrf(jsrfnatdic,ocetra(1,1,1,inatsco212),omask,0)
+         call accsrf(jsrfnatalk,ocetra(1,1,1,inatalkali),omask,0)
+         call accsrf(jnatpco2,natpco2d,omask,0)
+      endif
 #ifdef BROMO
       call accsrf(jsrfbromo,ocetra(1,1,1,ibromo),omask,0)
-      call accsrf(jbromo_prod,int_chbr3_prod,omask,0)     
-      call accsrf(jbromo_uv,int_chbr3_uv,omask,0)     
+      call accsrf(jbromo_prod,int_chbr3_prod,omask,0)
+      call accsrf(jbromo_uv,int_chbr3_uv,omask,0)
 #endif
 
 ! Accumulate the diagnostic mass sinking field 
@@ -289,15 +289,15 @@
       call acclyr(jprefalk,ocetra(1,1,1,iprefalk),pddpo,1)
       call acclyr(jprefdic,ocetra(1,1,1,iprefdic),pddpo,1)
       call acclyr(jdicsat,ocetra(1,1,1,idicsat),pddpo,1)
-#ifdef natDIC
-      call acclyr(jnatalkali,ocetra(1,1,1,inatalkali),pddpo,1)
-      call acclyr(jnatdic,ocetra(1,1,1,inatsco212),pddpo,1)
-      call acclyr(jnatcalc,ocetra(1,1,1,inatcalc),pddpo,1)
-      call acclyr(jnatco3,natco3,pddpo,1)                      
-      call acclyr(jnatph,nathi,pddpo,1)
-      call acclyr(jnatomegaa,natOmegaA,pddpo,1)
-      call acclyr(jnatomegac,natOmegaC,pddpo,1)
-#endif
+      if(with_natdic) then
+         call acclyr(jnatalkali,ocetra(1,1,1,inatalkali),pddpo,1)
+         call acclyr(jnatdic,ocetra(1,1,1,inatsco212),pddpo,1)
+         call acclyr(jnatcalc,ocetra(1,1,1,inatcalc),pddpo,1)
+         call acclyr(jnatco3,natco3,pddpo,1)
+         call acclyr(jnatph,nathi,pddpo,1)
+         call acclyr(jnatomegaa,natOmegaA,pddpo,1)
+         call acclyr(jnatomegac,natOmegaC,pddpo,1)
+      endif
 #ifdef cisonew
       call acclyr(jdic13,ocetra(1,1,1,isco213),pddpo,1)    
       call acclyr(jdic14,ocetra(1,1,1,isco214),pddpo,1)    
@@ -364,15 +364,15 @@
           call acclvl(jlvlprefalk,ocetra(1,1,1,iprefalk),k,ind1,ind2,wghts)
           call acclvl(jlvlprefdic,ocetra(1,1,1,iprefdic),k,ind1,ind2,wghts)
           call acclvl(jlvldicsat,ocetra(1,1,1,idicsat),k,ind1,ind2,wghts)
-#ifdef natDIC
-          call acclvl(jlvlnatdic,ocetra(1,1,1,inatsco212),k,ind1,ind2,wghts)
-          call acclvl(jlvlnatalkali,ocetra(1,1,1,inatalkali),k,ind1,ind2,wghts)
-          call acclvl(jlvlnatcalc,ocetra(1,1,1,inatcalc),k,ind1,ind2,wghts)
-          call acclvl(jlvlnatco3,natco3,k,ind1,ind2,wghts)
-          call acclvl(jlvlnatph,nathi,k,ind1,ind2,wghts)
-          call acclvl(jlvlnatomegaa,natOmegaA,k,ind1,ind2,wghts)
-          call acclvl(jlvlnatomegac,natOmegaC,k,ind1,ind2,wghts)
-#endif
+          if(with_natdic) then
+             call acclvl(jlvlnatdic,ocetra(1,1,1,inatsco212),k,ind1,ind2,wghts)
+             call acclvl(jlvlnatalkali,ocetra(1,1,1,inatalkali),k,ind1,ind2,wghts)
+             call acclvl(jlvlnatcalc,ocetra(1,1,1,inatcalc),k,ind1,ind2,wghts)
+             call acclvl(jlvlnatco3,natco3,k,ind1,ind2,wghts)
+             call acclvl(jlvlnatph,nathi,k,ind1,ind2,wghts)
+             call acclvl(jlvlnatomegaa,natOmegaA,k,ind1,ind2,wghts)
+             call acclvl(jlvlnatomegac,natOmegaC,k,ind1,ind2,wghts)
+          endif
 #ifdef cisonew
           call acclvl(jlvld13c,d13c,k,ind1,ind2,wghts)
           call acclvl(jlvld14c,d14c,k,ind1,ind2,wghts)

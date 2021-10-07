@@ -300,25 +300,25 @@
       endif
 
 ! Find out whether to restart natural tracers
-#ifdef natDIC
-      lread_nat=.true.
-      IF(IOTYPE==0) THEN
-        if(mnproc==1) ncstat=nf90_inq_varid(ncid,'natsco212',ncvarid)
-        call xcbcst(ncstat)
-        if(ncstat.ne.nf90_noerr) lread_nat=.false.
-      ELSE IF(IOTYPE==1) THEN
+      if(with_natdic) then
+         lread_nat=.true.
+         IF(IOTYPE==0) THEN
+            if(mnproc==1) ncstat=nf90_inq_varid(ncid,'natsco212',ncvarid)
+            call xcbcst(ncstat)
+            if(ncstat.ne.nf90_noerr) lread_nat=.false.
+         ELSE IF(IOTYPE==1) THEN
 #ifdef PNETCDF
-        ncstat=nfmpi_inq_varid(ncid,'natsco212',ncvarid)
-        if(ncstat.ne.nf_noerr) lread_nat=.false.
+            ncstat=nfmpi_inq_varid(ncid,'natsco212',ncvarid)
+            if(ncstat.ne.nf_noerr) lread_nat=.false.
 #endif
-      ENDIF
-      IF(mnproc==1 .and. .not. lread_nat) THEN
-        WRITE(io_stdo_bgc,*) ' '
-        WRITE(io_stdo_bgc,*) 'AUFR_BGC info: natural tracers not in restart file. '
-        WRITE(io_stdo_bgc,*) ' Initialising natural tracers with their non-natural '
-        WRITE(io_stdo_bgc,*) ' counterpart.'
-      ENDIF
-#endif
+         ENDIF
+         IF(mnproc==1 .and. .not. lread_nat) THEN
+            WRITE(io_stdo_bgc,*) ' '
+            WRITE(io_stdo_bgc,*) 'AUFR_BGC info: natural tracers not in restart file. '
+            WRITE(io_stdo_bgc,*) ' Initialising natural tracers with their non-natural '
+            WRITE(io_stdo_bgc,*) ' counterpart.'
+         ENDIF
+      endif
 
 ! Find out whether to restart marine carbon isotopes
 #ifdef cisonew
@@ -431,25 +431,30 @@
          CALL read_netcdf_var(ncid,'cfc12',locetra(1,1,1,icfc12),2*kpke,0,iotype)
          CALL read_netcdf_var(ncid,'sf6',locetra(1,1,1,isf6),2*kpke,0,iotype)
       endif
-#ifdef natDIC
-      IF(lread_nat) THEN
-      CALL read_netcdf_var(ncid,'natsco212',locetra(1,1,1,inatsco212),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'natalkali',locetra(1,1,1,inatalkali),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'natcalciu',locetra(1,1,1,inatcalc),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'nathi',nathi(1,1,1),kpke,0,iotype)
-      ELSE
-      CALL read_netcdf_var(ncid,'sco212',locetra(1,1,1,inatsco212),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'alkali',locetra(1,1,1,inatalkali),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'calciu',locetra(1,1,1,inatcalc),2*kpke,0,iotype)
-      CALL read_netcdf_var(ncid,'hi',nathi(1,1,1),kpke,0,iotype)
-      ENDIF
-#endif
+      if(with_natdic) then
+         IF(lread_nat) THEN
+            CALL read_netcdf_var(ncid,'natsco212',locetra(1,1,1,inatsco212),   &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'natalkali',locetra(1,1,1,inatalkali),   &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'natcalciu',locetra(1,1,1,inatcalc),     &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'nathi',nathi(1,1,1),kpke,0,iotype)
+         ELSE
+            CALL read_netcdf_var(ncid,'sco212',locetra(1,1,1,inatsco212),      &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'alkali',locetra(1,1,1,inatalkali),      &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'calciu',locetra(1,1,1,inatcalc),        &
+                 2*kpke,0,iotype)
+            CALL read_netcdf_var(ncid,'hi',nathi(1,1,1),kpke,0,iotype)
+         ENDIF
+      endif
 #ifdef BROMO
       IF(lread_bro) THEN
       CALL read_netcdf_var(ncid,'bromo',locetra(1,1,1,ibromo),2*kpke,0,iotype)
       ENDIF
 #endif
-
 !
 ! Read restart data : diagnostic ocean fields (needed for bit to bit reproducability)
 !
@@ -522,9 +527,9 @@
       atm2(:,:,2,iatmc14) = atm(:,:,iatmc14)
       ENDIF
 #endif
-#ifdef natDIC
-      CALL read_netcdf_var(ncid,'atmnco2',atm2(1,1,1,iatmnco2),2,0,iotype)
-#endif
+      if(with_natdic) then
+         CALL read_netcdf_var(ncid,'atmnco2',atm2(1,1,1,iatmnco2),2,0,iotype)
+      endif
       ELSE
       ! If atmosphere field is not in restart, copy the atmosphere field
       ! (initialised in beleg.F90) into both timelevels of atm2.

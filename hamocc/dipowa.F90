@@ -211,14 +211,14 @@ subroutine dipowa(kpie,kpje,kpke,omask)
            ! used in inventory_bgc/maschk (diagnostics)
            sedfluxo(i,j,iv) = sedfluxo(i,j,iv)                                 &
                 &  + ocetra(i,j,kbo(i,j),iv) - aprior
-#ifdef natDIC
-           if (iv==isco212) ocetra(i,j,kbo(i,j),inatsco212) =                  &
-                &  ocetra(i,j,kbo(i,j),inatsco212) +                           &
-                &  ocetra(i,j,kbo(i,j),iv) - aprior
-           if (iv==ialkali) ocetra(i,j,kbo(i,j),inatalkali) =                  &
-                &  ocetra(i,j,kbo(i,j),inatalkali) +                           &
-                &  ocetra(i,j,kbo(i,j),iv) - aprior
-#endif
+           if(with_natdic) then
+              if (iv==isco212) ocetra(i,j,kbo(i,j),inatsco212) =               &
+                   &  ocetra(i,j,kbo(i,j),inatsco212) +                        &
+                   &  ocetra(i,j,kbo(i,j),iv) - aprior
+              if (iv==ialkali) ocetra(i,j,kbo(i,j),inatalkali) =               &
+                   &  ocetra(i,j,kbo(i,j),inatalkali) +                        &
+                   &  ocetra(i,j,kbo(i,j),iv) - aprior
+           endif
         endif
      enddo
   enddo

@@ -48,7 +48,7 @@
                               & ropal,spemor,tf0,tf1,tf2,tff,wcal,wdust,wopal,wpoc,zinges 
       use mo_sedmnt,      only: claydens,o2ut,rno3
       use mo_control_bgc, only: dtb,io_stdo_bgc
-      use mo_param1_bgc,  only: iatmco2,iatmnco2,iatmo2,iatmn2,iatmc13,iatmc14,iatmbromo
+      use mo_param1_bgc,  only: iatmco2,iatmnco2,iatmo2,iatmn2,iatmc13,iatmc14,iatmbromo,with_natdic
       use mod_xc,         only: mnproc
 
 #ifdef AGG
@@ -90,9 +90,9 @@
 !
       atm_o2  = 196800.
       atm_n2  = 802000.
-#ifdef natDIC
-      atm_co2_nat = 284.32 ! CMIP6 pre-industrial reference
-#endif
+      if(with_natdic) then
+         atm_co2_nat = 284.32 ! CMIP6 pre-industrial reference
+      endif
 #ifdef BROMO
 !For now use 3.4ppt from Hense and Quack (2009; Biogeosciences) NEED TO
 !BE UPDATED WITH Ziska et al. (2013) climatology database
@@ -128,9 +128,9 @@
         atm(i,j,iatmco2)  = atm_co2
         atm(i,j,iatmo2)   = atm_o2
         atm(i,j,iatmn2)   = atm_n2
-#ifdef natDIC
-        atm(i,j,iatmnco2) = atm_co2_nat
-#endif   
+        if(with_natdic) then
+           atm(i,j,iatmnco2) = atm_co2_nat
+        endif
 #ifdef cisonew
         atm(i,j,iatmc13)  = atm_c13
         atm(i,j,iatmc14)  = atm_c14/c14fac
