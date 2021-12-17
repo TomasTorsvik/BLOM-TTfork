@@ -131,9 +131,10 @@
 #ifdef BROMO
       INTEGER, PARAMETER :: i_bromo=1,                                  &
      &                      ibromo=i_base+i_iso+i_cfc+i_agg+i_nat_dic+1
-#else 
+#else
       INTEGER, PARAMETER :: i_bromo=0,                                  &
      &                      ibromo=-1
+#endif
 #ifdef trc_passive
       integer, parameter :: i_trc_passive=1,                            &
      &                      ipasstrc = i_base + i_iso + i_cfc + i_agg   &
