@@ -120,7 +120,7 @@
 
       implicit none
 
-      INTEGER, intent(in) :: kpie,kpje,kpke,kbnd     
+      INTEGER, intent(in) :: kpie,kpje,kpke,kbnd
       REAL,    intent(in) :: pdlxp(kpie,kpje)
       REAL,    intent(in) :: pdlyp(kpie,kpje)
       REAL,    intent(in) :: pddpo(kpie,kpje,kpke)
@@ -162,7 +162,7 @@
       REAL    :: rco213,rco214
       REAL    :: dissol13,dissol14
       REAL    :: flux14d,flux14u,flux13d,flux13u
-      REAL    :: atco213,atco214,pco213,pco214      
+      REAL    :: atco213,atco214,pco213,pco214
       REAL    :: frac_k,frac_aqg,frac_dicg
 #endif
 #ifdef BROMO
@@ -202,7 +202,6 @@
 !$OMP  ,flx12,flxsf,atm_cfc11,atm_cfc12,atm_sf6                       &
 !$OMP  ,natcu,natcb,natcc,natpco2,natfluxd,natfluxu,natomega          &
 !$OMP  ,natsupsat,natundsa,natdissol                                  &
-#endif
 #ifdef cisonew
 !$OMP  ,atco213,atco214,rco213,rco214,pco213,pco214,frac_aqg          &
 !$OMP  ,frac_dicg,flux13d,flux13u,flux14d,flux14u,dissol13,dissol14   &
@@ -328,10 +327,10 @@
           a_sf = exp(-80.0343  + 117.232 *(100/tk) +  29.5817*log(tk100)  &
      &             +s*(0.033518-0.0373942*(tk100)+0.00774862*(tk100)**2))
 ! conversion from mol/(l * atm) to kmol/(m3 * pptv) 
-      a_11 = 1e-12 * a_11
-      a_12 = 1e-12 * a_12
-      a_sf = 1e-12 * a_sf
-#endif
+          a_11 = 1e-12 * a_11
+          a_12 = 1e-12 * a_12
+          a_sf = 1e-12 * a_sf
+       endif
 #ifdef BROMO
 !Henry's law constant [dimensionless] for Bromoform from Quack and Wallace (2003; GBC)
       a_bromo = exp(13.16 - 4973*(1/tk))

@@ -388,9 +388,9 @@ c --- Compute log10 of pH
       endif
 c
 c --- Store 2d fields
-      call wrtsrf(jkwco2(iogrp),SRF_KWCO2(iogrp),rnacc,0.,cmpflg,       
+      call wrtsrf(jkwco2(iogrp),SRF_KWCO2(iogrp),rnacc,0.,cmpflg,
      .  'kwco2',' ',' ',' ')
-      call wrtsrf(jpco2(iogrp),SRF_PCO2(iogrp),rnacc,0.,cmpflg,         
+      call wrtsrf(jpco2(iogrp),SRF_PCO2(iogrp),rnacc,0.,cmpflg,
      .  'pco2','Surface PCO2',' ','uatm')
       call wrtsrf(jdmsflux(iogrp),SRF_DMSFLUX(iogrp),rnacc*1e3/dtbgc,0.,
      .  cmpflg,'dmsflux','DMS flux',' ','mol DMS m-2 s-1')
@@ -532,7 +532,8 @@ c --- Store 2d fields
       if(with_natdic) then
          call wrtsrf(jsrfnatdic(iogrp),SRF_NATDIC(iogrp),
      .        rnacc*1e3,0.,cmpflg,'srfnatdissic',
-     .        'Surface natural dissolved inorganic carbon',' ','mol C m-3')
+     .        'Surface natural dissolved inorganic carbon',' ',
+     .        'mol C m-3')
          call wrtsrf(jsrfnatalk(iogrp),SRF_NATALKALI(iogrp),
      .        rnacc*1e3,0.,cmpflg,'srfnattalk',
      .        'Surface natural alkalinity',' ','eq m-3')

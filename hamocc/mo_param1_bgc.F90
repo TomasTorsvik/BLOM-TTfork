@@ -170,7 +170,7 @@
       logical, protected :: with_ciso = .false.
       logical, protected :: with_natdic = .false.
 
-      namelist /bgctacs/ with_agg, with_cfc, with_ciso, with_natdic
+      namelist /bgctracs/ with_agg, with_cfc, with_ciso, with_natdic
 
     contains
 
@@ -179,9 +179,12 @@
       ! Read namelist to determine what hamocc tracers to activate.
       ! Set indices for tracer variables.
       !-------------------------------------------------------------------------
-        use mo_control_bgc, only: bgc_namelist, get_bgc_namelist
+        use mod_xc,         only: mnproc
+        use mo_control_bgc, only: bgc_namelist, get_bgc_namelist, io_stdo_bgc
 
         implicit none
+
+        integer :: iounit
 
         ! Read namelist variables
         if(.not. allocated(bgc_namelist)) call get_bgc_namelist
@@ -191,7 +194,7 @@
         IF (mnproc.eq.1) THEN
            write(io_stdo_bgc,*)
            write(io_stdo_bgc,*) 'iHAMOCC: reading namelist BGCTRACS'
-           write(io_stdo_bgc,nml=BGCNML)
+           write(io_stdo_bgc,nml=BGCTRACS)
         ENDIF
 
         if(with_ciso) then
