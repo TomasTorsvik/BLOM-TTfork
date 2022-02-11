@@ -164,13 +164,18 @@
      &                      ipowc13=-1,                                 &
      &                      ipowc14=-1
 
-! Logical switches
-      logical, protected :: with_agg = .false.
-      logical, protected :: with_cfc = .false.
-      logical, protected :: with_ciso = .false.
-      logical, protected :: with_natdic = .false.
+! BGC tracer switches
+      logical, protected :: with_cfc = .false.     ! Include CFC tracers
+      logical, protected :: with_ciso = .false.    ! Include C-isotopes
+      logical, protected :: with_natdic = .false.  ! Include natural DIC tracers
+      ! Select particle sinking scheme
+      !   0 = constant velocity
+      !   1 = linear vertical velocity profile (default)
+      !   2 = particle sinking aggregation
+      integer, protected :: part_sink_scheme = 1
 
-      namelist /bgctracs/ with_agg, with_cfc, with_ciso, with_natdic
+      namelist /bgctracs/ with_cfc, with_ciso, with_natdic,             &
+     &                    part_sink_scheme
 
     contains
 
@@ -252,7 +257,7 @@
            iatmsf6 = i_base_atm+i_iso_atm+3
         endif
 
-        if(with_agg) then
+        if(part_sink_scheme == 2) then
            i_agg = 2
            inos   = i_base+i_iso+i_cfc+1
            iadust = i_base+i_iso+i_cfc+2
