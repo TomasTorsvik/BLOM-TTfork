@@ -1,20 +1,20 @@
 ! Copyright (C) 2001  Ernst Maier-Reimer, S. Legutke
-! Copyright (C) 2020  K. Assmann, J. Tjiputra, J. Schwinger, A. Moree, 
+! Copyright (C) 2020  K. Assmann, J. Tjiputra, J. Schwinger, A. Moree,
 !                     C. Heinze
 !
 ! This file is part of BLOM/iHAMOCC.
 !
 ! BLOM is free software: you can redistribute it and/or modify it under the
-! terms of the GNU Lesser General Public License as published by the Free 
-! Software Foundation, either version 3 of the License, or (at your option) 
-! any later version. 
+! terms of the GNU Lesser General Public License as published by the Free
+! Software Foundation, either version 3 of the License, or (at your option)
+! any later version.
 !
-! BLOM is distributed in the hope that it will be useful, but WITHOUT ANY 
-! WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+! BLOM is distributed in the hope that it will be useful, but WITHOUT ANY
+! WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 ! FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
-! more details. 
+! more details.
 !
-! You should have received a copy of the GNU Lesser General Public License 
+! You should have received a copy of the GNU Lesser General Public License
 ! along with BLOM. If not, see https://www.gnu.org/licenses/.
 
 
@@ -37,7 +37,7 @@
 !     J.Tjiputra,            *BCCR*           09.18.08
 !     - modified all carbon chemistry formulations following the OCMIP protocols
 !
-!     J.Schwinger,           *GFI, UiB*       2013-04-22    
+!     J.Schwinger,           *GFI, UiB*       2013-04-22
 !     - Use density prho consistent with MICOM for conversion to mol/kg
 !     - Calculate solubility of O2 and N2 every timestep, consistent with
 !       what is done for carbon chemistry. Array chemcm not used any more.
@@ -99,12 +99,12 @@
       USE mo_biomod
       USE mo_sedmnt
       USE mo_control_bgc
-      USE mo_param1_bgc 
+      USE mo_param1_bgc
       use mo_vgrid, only: dp_min,kbo,ptiestu
 
       implicit none
 
-      INTEGER, intent(in) :: kpie,kpje,kpke,kbnd     
+      INTEGER, intent(in) :: kpie,kpje,kpke,kbnd
       REAL,    intent(in) :: pdlxp(kpie,kpje)
       REAL,    intent(in) :: pdlyp(kpie,kpje)
       REAL,    intent(in) :: pddpo(kpie,kpje,kpke)
@@ -128,7 +128,7 @@
       REAL    :: Xconvxa
       REAL    :: oxflux,niflux,dmsflux,n2oflux
       REAL    :: ato2,atn2,atco2,pco2
-      REAL    :: oxy,ani,anisa 
+      REAL    :: oxy,ani,anisa
       REAL    :: rrho,t,t2,t3,t4,tk,tk100,prb,s,rs
       REAL    :: Kh,Khd,K1,K2,Kb,K1p,K2p,K3p,Ksi,Kw,Ks1,Kf,Kspc,Kspa
       REAL    :: tc,ta,sit,pt,ah1,ac,cu,cb,cc,tc_sat
@@ -147,12 +147,13 @@
       REAL    :: rco213,rco214
       REAL    :: dissol13,dissol14
       REAL    :: flux14d,flux14u,flux13d,flux13u
-      REAL    :: atco213,atco214,pco213,pco214      
+      REAL    :: atco213,atco214,pco213,pco214
       REAL    :: frac_k,frac_aqg,frac_dicg
 #endif
 #ifdef BROMO
       REAL    :: flx_bromo,sch_bromo,kw_bromo,a_bromo,atbrf,Kb1,lsub
 #endif
+      REAL    :: icelid    ! Permissible gas exchange through sea ice
 
 ! set variables for diagnostic output to zero
        atmflx (:,:,:)=0.
@@ -164,7 +165,7 @@
        co214fxd (:,:)=0.
        co214fxu (:,:)=0.
 #endif
-       pco2d    (:,:)=0. 
+       pco2d    (:,:)=0.
        kwco2sol (:,:)=0.
        co2star(:,:,:)=0.
        co3    (:,:,:)=0.
@@ -172,7 +173,7 @@
        omegaA (:,:,:)=0.
        omegaC (:,:,:)=0.
 #ifdef natDIC
-       natpco2d   (:,:)=0. 
+       natpco2d   (:,:)=0.
        natco3   (:,:,:)=0.
        natomegaA(:,:,:)=0.
        natomegaC(:,:,:)=0.
@@ -229,7 +230,7 @@
       CALL CARCHM_SOLVE(s,tc,ta,sit,pt,K1,K2,Kb,Kw,Ks1,Kf,Ksi,K1p,K2p,K3p, &
                         ah1,ac,niter)
 
-      if(ah1.gt.0.) then 
+      if(ah1.gt.0.) then
         hi(i,j,k)=max(1.e-20,ah1)
       endif
 
@@ -239,8 +240,8 @@
       cc = K2 * cb / ah1
       co2star(i,j,k)=cu
 
-! Carbonate ion concentration, convert from mol/kg to kmol/m^3 
-      co3(i,j,k)  = cc * rrho 
+! Carbonate ion concentration, convert from mol/kg to kmol/m^3
+      co3(i,j,k)  = cc * rrho
 
 #ifdef natDIC
       tc   = ocetra(i,j,k,inatsco212) / rrho  ! convert to mol/kg
@@ -250,7 +251,7 @@
       CALL CARCHM_SOLVE(s,tc,ta,sit,pt,K1,K2,Kb,Kw,Ks1,Kf,Ksi,K1p,K2p,K3p, &
                         ah1,ac,niter)
 
-      if(ah1.gt.0.) then 
+      if(ah1.gt.0.) then
         nathi(i,j,k)=max(1.e-20,ah1)
       endif
 
@@ -258,7 +259,7 @@
       natcu = ( 2. * tc - ac ) / ( 2. + K1 / ah1 )
       natcb = K1 * natcu / ah1
       natcc = K2 * natcb / ah1
-! Natural carbonate ion concentration, convert from mol/kg to kmol/m^3 
+! Natural carbonate ion concentration, convert from mol/kg to kmol/m^3
       natco3(i,j,k) = natcc * rrho
 #endif
 
@@ -280,7 +281,7 @@
       scco2 = 2116.8 - 136.25*t + 4.7353*t2 - 0.092307*t3 + 0.0007555 *t4
       sco2  = 1920.4 - 135.6 *t + 5.2122*t2 - 0.10939 *t3 + 0.00093777*t4
       scn2  = 2304.8 - 162.75*t + 6.2557*t2 - 0.13129 *t3 + 0.0011255 *t4
-      scdms = 2855.7 - 177.63*t + 6.0438*t2 - 0.11645 *t3 + 0.00094743*t4 
+      scdms = 2855.7 - 177.63*t + 6.0438*t2 - 0.11645 *t3 + 0.00094743*t4
       scn2o = 2356.2 - 166.38*t + 6.3952*t2 - 0.13422 *t3 + 0.0011506 *t4
 #ifdef CFC
       sch_11= 3579.2 - 222.63*t + 7.5749*t2 - 0.14595 *t3 + 0.0011874 *t4
@@ -298,7 +299,7 @@
        ani=an0+an1/tk100+an2*alog(tk100)+an3*tk100+s*(an4+an5*tk100+an6*tk100**2)
        anisa=exp(ani)*oxyco
 
-! solubility of laughing gas  (Weiss and Price 1980, Marine Chemistry, 8, 347-359) 
+! solubility of laughing gas  (Weiss and Price 1980, Marine Chemistry, 8, 347-359)
 ! for moist air at 1 atm in kmol/m^3/atm
        rs=al1+al2/tk100+al3*log(tk100)+al4*tk100**2+s*(bl1+bl2*tk100+bl3*tk100**2)
        satn2o(i,j)=exp(rs)
@@ -309,14 +310,14 @@
 ! These are the alpha in (1b) of the ocmpic2 howto
       a_11 = exp(-229.9261 + 319.6552*(100/tk) + 119.4471*log(tk100)  &
      &         -1.39165*(tk100)**2 + s*(-0.142382 + 0.091459*(tk100)  &
-     &         -0.0157274*(tk100)**2)) 
+     &         -0.0157274*(tk100)**2))
       a_12 = exp(-218.0971 + 298.9702*(100/tk) + 113.8049*log(tk100)  &
      &         -1.39165*(tk100)**2 + s*(-0.143566 + 0.091015*(tk100)  &
-     &         -0.0153924*(tk100)**2)) 
+     &         -0.0153924*(tk100)**2))
       a_sf = exp(-80.0343  + 117.232 *(100/tk) +  29.5817*log(tk100)  &
-     &         +s*(0.033518-0.0373942*(tk100)+0.00774862*(tk100)**2)) 
-! conversion from mol/(l * atm) to kmol/(m3 * pptv) 
-      a_11 = 1e-12 * a_11 
+     &         +s*(0.033518-0.0373942*(tk100)+0.00774862*(tk100)**2))
+! conversion from mol/(l * atm) to kmol/(m3 * pptv)
+      a_11 = 1e-12 * a_11
       a_12 = 1e-12 * a_12
       a_sf = 1e-12 * a_sf
 #endif
@@ -325,20 +326,26 @@
       a_bromo = exp(13.16 - 4973*(1/tk))
 #endif
 
-! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1 
-       Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2 
-       kwco2 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
-       kwo2  = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5 
-       kwn2  = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5 
-       kwdms = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5 
-       kwn2o = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5 
+
+! Permissible gas exchange through sea ice (Steiner et al. (2013); JGR Oceans)
+! Changed from original paper:  icelid = 1 - b
+! icelid = 0.0 : no ice lid effect; icelid = 1.0 : solid ice lid
+      icelid = 0.9
+
+! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
+       Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
+       kwco2 = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
+       kwo2  = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
+       kwn2  = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
+       kwdms = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5
+       kwn2o = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5
 #ifdef CFC
-       kw_11 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
-       kw_12 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
-       kw_sf = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
+       kw_11 = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
+       kw_12 = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
+       kw_sf = (1.-icelid*psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
 #endif
 #ifdef BROMO
-! Stemmler et al. (2015; Biogeosciences) Eq. (8) 
+! Stemmler et al. (2015; Biogeosciences) Eq. (8)
 !  1.e-2/3600 = conversion from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
        kw_bromo=(1.-psicomo(i,j)) * 1.e-2/3600. *                       &
      &     (0.222*pfu10(i,j)**2+0.33*pfu10(i,j))*(660./sch_bromo)**0.5
@@ -360,13 +367,13 @@
 ! mixing ratio (i.e. partial presure = mixing ratio*SLP/P_0 [atm])
        rpp0 = ppao(i,j)/101325.0
 
-       fluxd=atco2*rpp0*kwco2*dtbgc*Kh*1e-6*rrho ! Kh is in mol/kg/atm. Multiply by rrho (g/cm^3) 
-       fluxu=pco2      *kwco2*dtbgc*Kh*1e-6*rrho ! to get fluxes in kmol/m^2      
-!JT set limit for CO2 outgassing to avoid negative DIC concentration, set minimum DIC concentration to 1e-5 kmol/m3 
+       fluxd=atco2*rpp0*kwco2*dtbgc*Kh*1e-6*rrho ! Kh is in mol/kg/atm. Multiply by rrho (g/cm^3)
+       fluxu=pco2      *kwco2*dtbgc*Kh*1e-6*rrho ! to get fluxes in kmol/m^2
+!JT set limit for CO2 outgassing to avoid negative DIC concentration, set minimum DIC concentration to 1e-5 kmol/m3
        fluxu=min(fluxu,fluxd-(1e-5 - ocetra(i,j,k,isco212))*pddpo(i,j,1))
 #ifdef natDIC
        natfluxd=atm_co2_nat*rpp0*kwco2*dtbgc*Kh*1e-6*rrho
-       natfluxu=natpco2         *kwco2*dtbgc*Kh*1e-6*rrho 
+       natfluxu=natpco2         *kwco2*dtbgc*Kh*1e-6*rrho
        natfluxu=min(natfluxu,natfluxd-(1e-5 - ocetra(i,j,k,inatsco212))*pddpo(i,j,1))
 #endif
 
@@ -374,10 +381,10 @@
        ta = ocetra(i,j,k,ialkali) / rrho
        CALL carchm_solve_DICsat(s,atco2*rpp0,ta,sit,pt,Kh,K1,K2,Kb,Kw,Ks1,Kf, &
                                Ksi,K1p,K2p,K3p,tc_sat,niter)
-       ocetra(i,j,k,  idicsat)=tc_sat * rrho ! convert mol/kg to kmol/m^3 
+       ocetra(i,j,k,  idicsat)=tc_sat * rrho ! convert mol/kg to kmol/m^3
        ocetra(i,j,k+1,idicsat)=tc_sat * rrho ! k+1 = the rest of the mixed layer
 
-#ifdef cisonew 
+#ifdef cisonew
 ! Ocean-Atmosphere fluxes for carbon isotopes
        rco213=ocetra(i,j,1,isco213)/(ocetra(i,j,1,isco212)+safediv) ! Fraction DIC13 over total DIC
        rco214=ocetra(i,j,1,isco214)/(ocetra(i,j,1,isco212)+safediv) ! Fraction DIC14 over total DIC
@@ -389,10 +396,10 @@
        frac_k    = 0.99912                                 !Constant kinetic fractionation
        frac_aqg  = (0.0049*t - 1.31)/1000. + 1.  !Gas dissolution fractionation
        frac_dicg = (0.0144*t*(cc/(cc+cu+cb)) - 0.107*t + 10.53)/1000. + 1. !DIC to CO2 frac
-       flux13d=atco213*rpp0*kwco2*dtbgc*Kh*1.e-6*rrho*frac_aqg*frac_k         
-       flux13u=pco213      *kwco2*dtbgc*Kh*1.e-6*rrho*frac_aqg*frac_k/frac_dicg   
-       flux14d=atco214*rpp0*kwco2*dtbgc*Kh*1.e-6*rrho*(frac_aqg**2)*(frac_k**2)           
-       flux14u=pco214      *kwco2*dtbgc*Kh*1.e-6*rrho*(frac_aqg**2)*(frac_k**2)/(frac_dicg**2)  
+       flux13d=atco213*rpp0*kwco2*dtbgc*Kh*1.e-6*rrho*frac_aqg*frac_k
+       flux13u=pco213      *kwco2*dtbgc*Kh*1.e-6*rrho*frac_aqg*frac_k/frac_dicg
+       flux14d=atco214*rpp0*kwco2*dtbgc*Kh*1.e-6*rrho*(frac_aqg**2)*(frac_k**2)
+       flux14u=pco214      *kwco2*dtbgc*Kh*1.e-6*rrho*(frac_aqg**2)*(frac_k**2)/(frac_dicg**2)
 #endif
 
 ! Update DIC
@@ -409,10 +416,10 @@
        oxflux=kwo2*dtbgc*(ocetra(i,j,1,ioxygen)-satoxy(i,j,1)*(ato2/196800)*rpp0)
        ocetra(i,j,1,ioxygen)=ocetra(i,j,1,ioxygen)-oxflux/pddpo(i,j,1)
 ! Surface flux of gaseous nitrogen (same piston velocity as for O2)
-       niflux=kwn2*dtbgc*(ocetra(i,j,1,igasnit)-anisa*(atn2/802000)*rpp0) 
+       niflux=kwn2*dtbgc*(ocetra(i,j,1,igasnit)-anisa*(atn2/802000)*rpp0)
        ocetra(i,j,1,igasnit)=ocetra(i,j,1,igasnit)-niflux/pddpo(i,j,1)
 ! Surface flux of laughing gas (same piston velocity as for O2 and N2)
-       n2oflux=kwn2o*dtbgc*(ocetra(i,j,1,ian2o)-satn2o(i,j)*atn2o*rpp0) 
+       n2oflux=kwn2o*dtbgc*(ocetra(i,j,1,ian2o)-satn2o(i,j)*atn2o*rpp0)
        ocetra(i,j,1,ian2o)=ocetra(i,j,1,ian2o)-n2oflux/pddpo(i,j,1)
 #ifdef CFC
 ! Surface fluxes for CFC: eqn. (1a) in ocmip2 howto doc(hyc)
@@ -454,22 +461,22 @@
 #endif
 
 ! Surface flux of dms
-       dmsflux = kwdms*dtbgc*ocetra(i,j,1,idms)  
+       dmsflux = kwdms*dtbgc*ocetra(i,j,1,idms)
        ocetra(i,j,1,idms)=ocetra(i,j,1,idms)-dmsflux/pddpo(i,j,1)
 #ifdef BROMO
 ! Quack and Wallace (2003) eq. 1
-! flux = kw*(Cw - Ca/H) ; kw[m s-1]; Cw[kmol m-3]; 
-! Convert Ca(atbrf) from 
+! flux = kw*(Cw - Ca/H) ; kw[m s-1]; Cw[kmol m-3];
+! Convert Ca(atbrf) from
 !  [pptv]    to [ppp]      by multiplying with 1e-12 (ppp = parts per part, dimensionless)
 !  [ppp]     to [mol L-1]  by multiplying with pressure[bar]/(SST[K]*R[L bar K-1 mol-1]); R=0,083
-!  [mol L-1] to [kmol m-3] by multiplying with 1 
+!  [mol L-1] to [kmol m-3] by multiplying with 1
       flx_bromo=kw_bromo*dtbgc*                                         &
      & (atbrf/a_bromo*1e-12*ppao(i,j)*1e-5/(tk*0.083) - ocetra(i,j,1,ibromo))
       ocetra(i,j,1,ibromo)=ocetra(i,j,1,ibromo)+flx_bromo/pddpo(i,j,1)
 #endif
 
 
-! Save surface fluxes 
+! Save surface fluxes
        atmflx(i,j,iatmco2)=fluxu-fluxd
        atmflx(i,j,iatmo2)=oxflux
        atmflx(i,j,iatmn2)=niflux
@@ -492,13 +499,13 @@
 #endif
 
 ! Save up- and downward components of carbon fluxes for output
-       co2fxd(i,j)  = fluxd 
-       co2fxu(i,j)  = fluxu 
+       co2fxd(i,j)  = fluxd
+       co2fxu(i,j)  = fluxu
 #ifdef cisonew
-       co213fxd(i,j)= flux13d 
-       co213fxu(i,j)= flux13u 
-       co214fxd(i,j)= flux14d 
-       co214fxu(i,j)= flux14u 
+       co213fxd(i,j)= flux13d
+       co213fxu(i,j)= flux13u
+       co214fxd(i,j)= flux14d
+       co214fxu(i,j)= flux14u
 #endif
 
 ! Save pco2 w.r.t. dry air for output
@@ -514,7 +521,7 @@
       endif ! k==1
 #ifdef BROMO
 ! Degradation to hydrolysis (Eq. 2-4 of Stemmler et al., 2015)
-! A1=1.23e17 mol min-1 => 2.05e12 kmol sec-1 
+! A1=1.23e17 mol min-1 => 2.05e12 kmol sec-1
        Kb1=2.05e12*exp(-1.073e5/(8.314*tk))*dtbgc
        ocetra(i,j,k,ibromo)=ocetra(i,j,k,ibromo)*(1.-(Kb1*Kw/ah1))
 ! Degradation to halogen substitution (Eq. 5-6 of Stemmler et al., 2015)
@@ -527,7 +534,7 @@
 ! Determine Omega Calcite/Aragonite and dissolution of caco3 based on OmegaC:
 !   omegaC=([CO3]*[Ca])/([CO3]sat*[Ca]sat)
 !   Following Sarmiento and Gruber book, assumed that [Ca]=[Ca]sat
-!   Thus, [CO3]sat=[CO3]/OmegaC. 
+!   Thus, [CO3]sat=[CO3]/OmegaC.
       omega = ( calcon * s / 35. ) * cc
       OmegaA(i,j,k) = omega / Kspa
       OmegaC(i,j,k) = omega / Kspc
@@ -619,4 +626,3 @@
 
       RETURN
       END
-
