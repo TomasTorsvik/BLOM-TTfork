@@ -42,7 +42,10 @@ c******************************************************************************
      .                         mnproc,lp,nfu
       use mod_grid,      only: plon,plat
       use mod_tracers,   only: ntrbgc,ntr,itrbgc,trc
-      USE mo_control_bgc
+      USE mo_control_bgc, only: bgc_namelist,do_ndep,do_rivinpt,dtb,
+     .                          dtbgc,io_stdo_bgc,isac,ldtbgc,
+     .                          ldtrunbgc,icelid,
+     .                          ndtdaybgc,get_bgc_namelist 
       use mo_param1_bgc, only: ks,nsedtra,npowtra
       USE mo_carbch,     only: alloc_mem_carbch,ocetra,atm,atm_co2
       USE mo_biomod,     only: alloc_mem_biomod
@@ -59,6 +62,9 @@ c******************************************************************************
      .                         bgc_dx,bgc_dy,bgc_dp,bgc_rho,
      .                         omask,sedlay2,powtra2,burial2,
      .                         blom2hamocc
+#ifdef BOXATM
+      use mo_intfcblom, only: atm2
+#endif
 c
       implicit none
 c
@@ -68,7 +74,7 @@ c
       integer :: i,j,k,l,nt
       integer :: iounit
 
-      namelist /bgcnml/ atm_co2,do_rivinpt,do_ndep,
+      namelist /bgcnml/ atm_co2,icelid,do_rivinpt,do_ndep,
      .                  ndepfile,fedepfile,rivinfile,
      .                  inidic,inialk,inipo4,inioxy,inino3,inisil,
      .                  inid13c,inid14c,swaclimfile

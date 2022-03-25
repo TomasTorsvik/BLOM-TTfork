@@ -148,6 +148,7 @@ endif
 
 # set BGCNML defaults
 set ATM_CO2  = $CCSM_CO2_PPMV
+set ICELID = '1.0'
 if ($BLOM_RIVER_NUTRIENTS == TRUE) then
   set DO_RIVINPT = .true.
 else
@@ -1337,6 +1338,7 @@ cat >>! $RUNDIR/ocn_in$inststr << EOF
 ! CONTENTS:
 !
 ! ATM_CO2     : Atmospheric CO2 concentration [ppmv]
+! ICELID      : Permissible gas exchange through sea ice
 ! FEDEPFILE   : File name (incl. full path) for iron (dust) deposition data
 ! SWACLIMFILE : File name (incl. full path) for swa climatology field (needed 
 !               if bromoform scheme is activated)
@@ -1348,6 +1350,7 @@ cat >>! $RUNDIR/ocn_in$inststr << EOF
 !               OXY, NO3, SIL, D13C, and D14C
 &BGCNML
   ATM_CO2    = $CCSM_CO2_PPMV
+  ICELID     = $ICELID
   FEDEPFILE  = $FEDEPFILE
   SWACLIMFILE= $SWACLIMFILE
   DO_RIVINPT = $DO_RIVINPT

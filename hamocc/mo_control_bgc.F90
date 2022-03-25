@@ -58,7 +58,7 @@
       ! Permissible gas exchange through sea ice (Steiner et al. (2013); JGR Oceans)
       ! Changed from original paper:  icelid = 1 - b
       ! icelid = 0.0 : no ice lid effect; icelid = 1.0 : solid ice lid
-      REAL    :: icelid = 0.9     !  permissible gas exchange through sea ice
+      REAL    :: icelid = 1.0     !  default value (set via namelist)
 
       REAL    :: rmasks = 0.0       !  value at wet cells in sediment.
       REAL    :: rmasko = 99999.00  !  value at wet cells in ocean.
