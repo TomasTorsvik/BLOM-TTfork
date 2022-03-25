@@ -4,16 +4,16 @@
 ! This file is part of BLOM/iHAMOCC.
 !
 ! BLOM is free software: you can redistribute it and/or modify it under the
-! terms of the GNU Lesser General Public License as published by the Free 
-! Software Foundation, either version 3 of the License, or (at your option) 
-! any later version. 
+! terms of the GNU Lesser General Public License as published by the Free
+! Software Foundation, either version 3 of the License, or (at your option)
+! any later version.
 !
-! BLOM is distributed in the hope that it will be useful, but WITHOUT ANY 
-! WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+! BLOM is distributed in the hope that it will be useful, but WITHOUT ANY
+! WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 ! FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
-! more details. 
+! more details.
 !
-! You should have received a copy of the GNU Lesser General Public License 
+! You should have received a copy of the GNU Lesser General Public License
 ! along with BLOM. If not, see https://www.gnu.org/licenses/.
 
 
@@ -28,7 +28,7 @@
 !     --------
 !     J.Schwinger,      *Uni Research, Bergen*   2018-04-12
 !     - removed unused variables
-!     
+!
 !     Purpose
 !     -------
 !     - declaration
@@ -55,6 +55,10 @@
 
       INTEGER :: isac             !  acceleration factor for sediment, read from namelist
 
+      ! Permissible gas exchange through sea ice (Steiner et al. (2013); JGR Oceans)
+      ! Changed from original paper:  icelid = 1 - b
+      ! icelid = 0.0 : no ice lid effect; icelid = 1.0 : solid ice lid
+      REAL    :: icelid = 0.9     !  permissible gas exchange through sea ice
 
       REAL    :: rmasks = 0.0       !  value at wet cells in sediment.
       REAL    :: rmasko = 99999.00  !  value at wet cells in ocean.

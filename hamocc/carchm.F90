@@ -94,13 +94,36 @@
 !     none.
 !
 !**********************************************************************
-      USE mo_carbch
-      USE mo_chemcon
-      USE mo_biomod
-      USE mo_sedmnt
-      USE mo_control_bgc
-      USE mo_param1_bgc
+      USE mo_carbch, only: atm,atmflx,co2fxd,co2fxu,co2star,co3,hi,    &
+                         & keqb,kwco2sol,ocetra,omegaa,omegac,pco2d,   &
+                         & satn2o,satoxy
+      USE mo_chemcon, only: al1,al2,al3,al4,an0,an1,an2,an3,an4,an5,   &
+                         & an6,atn2o,bl1,bl2,bl3,calcon,ox0,ox1,ox2,   &
+                         & ox3,ox4,ox5,ox6,oxyco,tzero
+      USE mo_control_bgc, only: dtbgc,icelid
+      USE mo_param1_bgc, only: ialkali,iatmo2,iatmco2,iatmdms,iatmn2,  &
+                         & iatmn2o,ian2o,icalc,idicsat,idms,igasnit,   &
+                         & ioxygen,iphosph,isco212,isilica
       use mo_vgrid, only: dp_min,kbo,ptiestu
+#ifdef BROMO
+      use mo_param1_bgc, only: iatmbromo,ibromo
+#endif
+#ifdef CFC
+      use mo_carbch, only: atm_cfc11_nh,atm_cfc11_sh,atm_cfc12_nh,     &
+                         & atm_cfc12_sh,atm_sf6_nh,atm_sf6_sh
+      use mo_param1_bgc, only: iatmf11,iatmf12,iatmsf6,icfc11,icfc12,  &
+                         & isf6
+#endif
+#ifdef cisonew
+      use mo_carbch, only: co213fxd,co213fxu,co214fxd,co214fxu,c14dec
+      use mo_param1_bgc,only: iatmc13,iatmc14,icalc13,icalc14,idet14,  &
+                         & idoc14,iphy14,isco213,isco214,izoo14,safediv
+#endif
+#ifdef natDIC
+      use mo_param1_bgc, only: iatmnco2,inatalkali,inatcalc,inatsco212
+      use mo_carbch, only: atm_co2_nat,nathi,natco3,natpco2d,natomegaa,&
+                        & natomegac
+#endif
 
       implicit none
 
@@ -153,7 +176,6 @@
 #ifdef BROMO
       REAL    :: flx_bromo,sch_bromo,kw_bromo,a_bromo,atbrf,Kb1,lsub
 #endif
-      REAL    :: icelid    ! Permissible gas exchange through sea ice
 
 ! set variables for diagnostic output to zero
        atmflx (:,:,:)=0.
@@ -325,12 +347,6 @@
 !Henry's law constant [dimensionless] for Bromoform from Quack and Wallace (2003; GBC)
       a_bromo = exp(13.16 - 4973*(1/tk))
 #endif
-
-
-! Permissible gas exchange through sea ice (Steiner et al. (2013); JGR Oceans)
-! Changed from original paper:  icelid = 1 - b
-! icelid = 0.0 : no ice lid effect; icelid = 1.0 : solid ice lid
-      icelid = 0.9
 
 ! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
        Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
