@@ -83,7 +83,7 @@ module mod_cesm
    ! EXPERIMENTAL:
    ! Set absolute limiter on sea ice concentration. Artificially induce some
    ! fraction of open water.
-   real, parameter :: ficem_limiter = 0.99
+   real, parameter :: ficem_limiter = 0.98
 
    public :: runid_cesm, runtyp_cesm, ocn_cpl_dt_cesm, nstep_in_cpl, hmlt, &
              frzpot, mltpot, swa_da, nsf_da, hmlt_da, lip_da, sop_da, eva_da, &
