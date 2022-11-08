@@ -80,6 +80,11 @@ module mod_cesm
    integer :: &
       l1ci, l2ci         ! Time-level indices for time smoothing of CESM fields.
 
+   ! EXPERIMENTAL:
+   ! Set absolute limiter on sea ice concentration. Artificially induce some
+   ! fraction of open water.
+   real, parameter :: ficem_limiter = 0.99
+
    public :: runid_cesm, runtyp_cesm, ocn_cpl_dt_cesm, nstep_in_cpl, hmlt, &
              frzpot, mltpot, swa_da, nsf_da, hmlt_da, lip_da, sop_da, eva_da, &
              rnf_da, rfi_da, fmltfz_da, sfl_da, ztx_da, mty_da, ustarw_da, &
@@ -175,7 +180,8 @@ contains
            nsf(i, j)    = w1*nsf_da(i, j, l1ci)    + w2*nsf_da(i, j, l2ci)
            hmlt(i, j)   = w1*hmlt_da(i, j, l1ci)   + w2*hmlt_da(i, j, l2ci)
            slp(i, j)    = w1*slp_da(i, j, l1ci)    + w2*slp_da(i, j, l2ci)
-           ficem(i, j)  = w1*ficem_da(i, j, l1ci)  + w2*ficem_da(i, j, l2ci)
+           ficem(i, j)  = min(w1*ficem_da(i, j, l1ci)  + w2*ficem_da(i, j, l2ci), &
+                &             ficem_limiter)
            abswnd(i, j) = w1*abswnd_da(i, j, l1ci) + w2*abswnd_da(i, j, l2ci)
            atmco2(i, j) = w1*atmco2_da(i, j, l1ci) + w2*atmco2_da(i, j, l2ci)
            atmbrf(i, j) = w1*atmbrf_da(i, j, l1ci) + w2*atmbrf_da(i, j, l2ci)
