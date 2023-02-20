@@ -33,6 +33,7 @@ c
       use mod_state, only: u, v, dp, dpu, dpv, temp, saln, sigma,
      .                     p, pu, pv, kfpla
       use mod_diffusion, only: difdia
+      use mod_pointtest, only: itest, jtest, ptest
       use mod_forcing, only: ustarb
       use mod_utility, only: util1
       use mod_checksum, only: csdiag, chksummsk
@@ -80,6 +81,7 @@ c
       logical done,dwnwrd,remfmx
 c
       real, dimension(kdm) :: ttem0,ssal0,delp0,dens0,sigr0,nu0
+      real, dimension(kdm) :: rnd
       integer niter
 #ifdef TRC
       real, dimension(ntr,kdm) :: ttrc
@@ -127,6 +129,11 @@ cdiag
             enddo
 #endif
           enddo
+            if (mnproc.eq.ptest.and.i.eq.itest.and.j.eq.jtest) then
+                print*,'with_noise',ttem,ssal
+                print*,'with_noise_niter',niter
+                print*,'with_noise_difdia',nu
+            endif
 c
 c --- --- Locate range of physical layers.
           kfpl=kfpla(i,j,n)
@@ -646,10 +653,12 @@ c --- --- salinity, and tracers
             enddo
           endif
 c
+          call random_number(rnd)
 c --- --- Copy 1d arrays to 3d arrays
           do k=1,kk
             kn=k+nn
-            temp(i,j,kn)=ttem(k)
+            !with_noise
+            temp(i,j,kn)=ttem(k) + (2e-11*(1.0-rnd(k)) - 1e-11)
             saln(i,j,kn)=ssal(k)
             dp(i,j,kn)=delp(k)
             sigma(i,j,kn)=dens(k)
@@ -672,6 +681,10 @@ c --- --- Copy 1d arrays to 3d arrays
             enddo
 #endif
           enddo
+            if (mnproc.eq.ptest.and.i.eq.itest.and.j.eq.jtest) then
+                print*,'with_noise_end',ttem,ssal
+                print*,'with_noise_end_niter',niter
+            endif
 c
 c --- --- Save variables used for momentum mixing
           kming(i,j)=kmin
