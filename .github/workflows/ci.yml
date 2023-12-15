@@ -125,25 +125,25 @@ jobs:
       #     path: ${{ env.NFDIR }}
       #     key: netcdf-4.5.2-${{ runner.os }}-intel
 
-      - name: Checkout netCDF for compiling with Intel
-        # if: steps.cache-netcdf.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: 'Unidata/netcdf-fortran'
-          ref: 'v4.5.4'
+      # - name: Checkout netCDF for compiling with Intel
+      #   # if: steps.cache-netcdf.outputs.cache-hit != 'true'
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: 'Unidata/netcdf-fortran'
+      #     ref: 'v4.5.4'
 
-      - name: Compile and install custom netCDF
-        # if: steps.cache-netcdf.outputs.cache-hit != 'true'
-        run: |
-          source /opt/intel/oneapi/setvars.sh
-          ./configure --prefix="$NFDIR"
-          make
-          sudo make install
+      # - name: Compile and install custom netCDF
+      #   # if: steps.cache-netcdf.outputs.cache-hit != 'true'
+      #   run: |
+      #     source /opt/intel/oneapi/setvars.sh
+      #     ./configure --prefix="$NFDIR"
+      #     make
+      #     sudo make install
 
-      - name: Setup netCDF environment
-        run: |
-          echo "${NFDIR}/bin" >> $GITHUB_PATH
-          echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
+      # - name: Setup netCDF environment
+      #   run: |
+      #     echo "${NFDIR}/bin" >> $GITHUB_PATH
+      #     echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup Python for newer version of Meson
         uses: actions/setup-python@v5
