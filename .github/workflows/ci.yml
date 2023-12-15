@@ -71,7 +71,7 @@ jobs:
 
   intel:
     name: Build BLOM using Intel compilers
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -92,34 +92,42 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y ninja-build libnetcdf-dev
-      - name: Cache Intel setup
-        id: cache-intel
-        uses: actions/cache@v3
-        with:
-          path: /opt/intel/
-          key: intel-${{ runner.os }}-compiler
 
+      # - name: Cache Intel setup
+      #   id: cache-intel
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: /opt/intel/
+      #     key: intel-${{ runner.os }}-compiler
+
+      # - name: Setup Intel compiler
+      #   if: steps.cache-intel.outputs.cache-hit != 'true'
+      #   run: |
+      #     wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+      #     sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+      #     sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
+      #     sudo apt update
+      #     sudo apt install -y\
+      #       intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic\
+      #       intel-oneapi-compiler-fortran intel-oneapi-mpi-devel
+
+      # Follow setup from https://github.com/marketplace/actions/setup-fortran
       - name: Setup Intel compiler
-        if: steps.cache-intel.outputs.cache-hit != 'true'
-        run: |
-          wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-          sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
-          sudo apt update
-          sudo apt install -y\
-            intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic\
-            intel-oneapi-compiler-fortran intel-oneapi-mpi-devel
-
-      - name: Cache netCDF install
-        id: cache-netcdf
-        uses: actions/cache@v3
+        uses: fortran-lang/setup-fortran@v1
         with:
-          path: ${{ env.NFDIR }}
-          key: netcdf-4.5.2-${{ runner.os }}-intel
+          compiler: intel-classic
+          version: 2021.10
+
+      # - name: Cache netCDF install
+      #   id: cache-netcdf
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ${{ env.NFDIR }}
+      #     key: netcdf-4.5.2-${{ runner.os }}-intel
 
       - name: Checkout netCDF for compiling with Intel
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: 'Unidata/netcdf-fortran'
           ref: 'v4.5.2'
