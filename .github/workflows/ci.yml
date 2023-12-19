@@ -96,12 +96,12 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build libnetcdf-dev
 
-      # - name: Cache Intel setup
-      #   id: cache-intel
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /opt/intel/
-      #     key: intel-${{ runner.os }}-compiler
+      - name: Cache Intel setup
+        id: cache-intel
+        uses: actions/cache@v3
+        with:
+          path: /opt/intel/
+          key: intel-${{ runner.os }}-compiler
 
       # - name: Setup Intel compiler
       #   if: steps.cache-intel.outputs.cache-hit != 'true'
@@ -121,22 +121,22 @@ jobs:
           compiler: intel-classic
           version: 2021.10
 
-      # - name: Cache netCDF install
-      #   id: cache-netcdf
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ${{ env.NFDIR }}
-      #     key: netcdf-4.5.2-${{ runner.os }}-intel
+      - name: Cache netCDF install
+        id: cache-netcdf
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.NFDIR }}
+          key: netcdf-4.6.0-${{ runner.os }}-intel
 
       - name: Checkout netCDF for compiling with Intel
-        # if: steps.cache-netcdf.outputs.cache-hit != 'true'
+        if: steps.cache-netcdf.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: 'Unidata/netcdf-fortran'
-          ref: 'v4.9.0'
+          ref: 'v4.6.0'
 
       - name: Compile and install custom netCDF
-        # if: steps.cache-netcdf.outputs.cache-hit != 'true'
+        if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
           #source /opt/intel/oneapi/setvars.sh
           ./configure --prefix="$NFDIR"
