@@ -139,7 +139,7 @@ jobs:
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
           #source /opt/intel/oneapi/setvars.sh
-          ./configure --prefix="$NFDIR"
+          ./configure --prefix="$NFDIR" --host
           make
           sudo make install
 
