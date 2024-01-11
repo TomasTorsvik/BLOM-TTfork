@@ -126,20 +126,20 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.NFDIR }}
-          key: netcdf-4.6.0-${{ runner.os }}-intel
+          key: netcdf-4.5.4-${{ runner.os }}-intel
 
       - name: Checkout netCDF for compiling with Intel
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         uses: actions/checkout@v4
         with:
           repository: 'Unidata/netcdf-fortran'
-          ref: 'v4.6.0'
+          ref: 'v4.5.4'
 
       - name: Compile and install custom netCDF
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
           #source /opt/intel/oneapi/setvars.sh
-          CPPFLAGS=-I/opt/intel/oneapi/include LDFLAGS=-L/opt/intel/oneapi/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check --host={triplet}
+          CPPFLAGS=-I/opt/intel/oneapi/include LDFLAGS=-L/opt/intel/oneapi/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check --host=x86
           make
           sudo make install
 
