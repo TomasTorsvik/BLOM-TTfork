@@ -138,8 +138,8 @@ jobs:
       - name: Compile and install custom netCDF
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
-          source /opt/intel/oneapi/setvars.sh
-          ./configure --prefix="$NFDIR" --host
+          #source /opt/intel/oneapi/setvars.sh
+          CPPFLAGS=-I${NFDIR}/include LDFLAGS=-L${NFDIR}/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check
           make
           sudo make install
 
