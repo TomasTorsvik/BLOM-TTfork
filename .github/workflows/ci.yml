@@ -139,7 +139,8 @@ jobs:
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
           #source /opt/intel/oneapi/setvars.sh
-          CPPFLAGS=-I${NFDIR}/include LDFLAGS=-L${NFDIR}/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check --host
+          config.guess
+          CPPFLAGS=-I${NFDIR}/include LDFLAGS=-L${NFDIR}/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check --host=${HOST_SYS}
           make
           sudo make install
 
