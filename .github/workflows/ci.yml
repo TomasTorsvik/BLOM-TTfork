@@ -138,7 +138,7 @@ jobs:
       - name: Compile and install custom netCDF
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
-          #source /opt/intel/oneapi/setvars.sh
+          source /opt/intel/oneapi/setvars.sh
           ./configure --prefix="$NFDIR" --host
           make
           sudo make install
