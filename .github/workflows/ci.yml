@@ -143,10 +143,10 @@ jobs:
       #     make
       #     sudo make install
 
-      # - name: Setup netCDF environment
-      #   run: |
-      #     echo "${NFDIR}/bin" >> $GITHUB_PATH
-      #     echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
+      - name: Setup netCDF environment
+        run: |
+          echo "${NFDIR}/bin" >> $GITHUB_PATH
+          echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup Python for newer version of Meson
         uses: actions/setup-python@v5
