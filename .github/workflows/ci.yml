@@ -71,7 +71,7 @@ jobs:
 
   intel:
     name: Build BLOM using Intel compilers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -94,7 +94,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build libnetcdf-dev
+          sudo apt install -y ninja-build libnetcdf-dev libnetcdff-dev
 
       - name: Cache Intel setup
         id: cache-intel
@@ -121,32 +121,32 @@ jobs:
           compiler: intel-classic
           version: 2021.10
 
-      - name: Cache netCDF install
-        id: cache-netcdf
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.NFDIR }}
-          key: netcdf-4.5.4-${{ runner.os }}-intel
+      # - name: Cache netCDF install
+      #   id: cache-netcdf
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ${{ env.NFDIR }}
+      #     key: netcdf-4.6.0-${{ runner.os }}-intel
 
-      - name: Checkout netCDF for compiling with Intel
-        if: steps.cache-netcdf.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: 'Unidata/netcdf-fortran'
-          ref: 'v4.5.4'
+      # - name: Checkout netCDF for compiling with Intel
+      #   if: steps.cache-netcdf.outputs.cache-hit != 'true'
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: 'Unidata/netcdf-fortran'
+      #     ref: 'v4.6.0'
 
-      - name: Compile and install custom netCDF
-        if: steps.cache-netcdf.outputs.cache-hit != 'true'
-        run: |
-          #source /opt/intel/oneapi/setvars.sh
-          CPPFLAGS=-I/opt/intel/oneapi/include LDFLAGS=-L/opt/intel/oneapi/lib FC=ifort CC=icc ./configure --prefix="$NFDIR" --disable-fortran-type-check --host=x86
-          make
-          sudo make install
+      # - name: Compile and install custom netCDF
+      #   if: steps.cache-netcdf.outputs.cache-hit != 'true'
+      #   run: |
+      #     #source /opt/intel/oneapi/setvars.sh
+      #     CPPFLAGS=-I/opt/intel/oneapi/include LDFLAGS=-L/opt/intel/oneapi/lib FC=${{ env.FC }} CC=${{ env.CC }} ./configure --prefix="$NFDIR" --disable-fortran-type-check --host=x86
+      #     make
+      #     sudo make install
 
-      - name: Setup netCDF environment
-        run: |
-          echo "${NFDIR}/bin" >> $GITHUB_PATH
-          echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
+      # - name: Setup netCDF environment
+      #   run: |
+      #     echo "${NFDIR}/bin" >> $GITHUB_PATH
+      #     echo "PKG_CONFIG_PATH=${NFDIR}/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Setup Python for newer version of Meson
         uses: actions/setup-python@v5
