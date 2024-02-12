@@ -96,12 +96,12 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build libnetcdf-dev
 
-      - name: Cache Intel setup
-        id: cache-intel
-        uses: actions/cache@v3
-        with:
-          path: /opt/intel/
-          key: intel-${{ runner.os }}-compiler
+      # - name: Cache Intel setup
+      #   id: cache-intel
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: /opt/intel/
+      #     key: intel-${{ runner.os }}-compiler
 
       # - name: Setup Intel compiler
       #   if: steps.cache-intel.outputs.cache-hit != 'true'
@@ -138,7 +138,7 @@ jobs:
       - name: Compile and install custom netCDF
         if: steps.cache-netcdf.outputs.cache-hit != 'true'
         run: |
-          #source /opt/intel/oneapi/setvars.sh
+          source /opt/intel/oneapi/setvars.sh
           CPPFLAGS=-I/opt/intel/oneapi/include LDFLAGS=-L/opt/intel/oneapi/lib FC=${{ env.FC }} CC=${{ env.CC }} ./configure --prefix="$NFDIR" --disable-fortran-type-check --host=x86
           make
           sudo make install
@@ -163,7 +163,7 @@ jobs:
 
       - name: Build with Intel compilers
         run: |
-          # source /opt/intel/oneapi/setvars.sh
+          source /opt/intel/oneapi/setvars.sh
           meson setup builddir -Dmpi=${{ matrix.mpi }} -Dopenmp=${{ matrix.openmp }} -Decosys=${{ matrix.ecosys }} --buildtype=debugoptimized
           meson compile -C builddir
 
