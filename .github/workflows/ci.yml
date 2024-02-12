@@ -119,7 +119,7 @@ jobs:
         uses: fortran-lang/setup-fortran@v1
         with:
           compiler: intel
-          version: '2024.0'
+          version: '2023.2'
 
       # - name: Cache netCDF install
       #   id: cache-netcdf
