@@ -87,8 +87,8 @@ jobs:
         ecosys: [false]
     # Tell Meson to use Intel compilers
     env:
-      CC: icc
-      FC: ifort
+      CC: icx
+      FC: ifx
       NFDIR: '/opt/netcdf'
     steps:
       - name: Install dependencies
@@ -118,8 +118,8 @@ jobs:
       - name: Setup Intel compiler
         uses: fortran-lang/setup-fortran@v1
         with:
-          compiler: intel-classic
-          version: 2021.10
+          compiler: intel
+          version: '2023.2'
 
       # - name: Cache netCDF install
       #   id: cache-netcdf
