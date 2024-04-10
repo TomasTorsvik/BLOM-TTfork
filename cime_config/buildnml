@@ -206,10 +206,10 @@ def buildnml(case, caseroot, compname):
         # for the final namelist value
 
         case_dict = CaseDict()
-        var_list = ('DIN_LOC_ROOT', 'RUN_TYPE', 'BLOM_VCOORD','BLOM_NDEP_SCENARIO',
-                    'CCSM_CO2_PPMV','OCN_CO2_TYPE',
-                    'HAMOCC_SEDSPINUP_YR_START','HAMOCC_SEDSPINUP_YR_END',
-		    'HAMOCC_SEDSPINUP_NCYCLE')
+        var_list = ('DIN_LOC_ROOT', 'RUN_TYPE', 'BLOM_VCOORD', 'BLOM_NDEP_SCENARIO',
+                    'CCSM_CO2_PPMV', 'OCN_CO2_TYPE',
+                    'HAMOCC_SEDSPINUP_YR_START', 'HAMOCC_SEDSPINUP_YR_END',
+                    'HAMOCC_SEDSPINUP_NCYCLE', 'HAMOCC_ICE_LEADFRAC')
         for item in var_list:
             case_dict[item] = case.get_value(item)
 

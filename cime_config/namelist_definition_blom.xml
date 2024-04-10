@@ -3663,6 +3663,16 @@
     <desc>Number of subcyles per time-step for sediment spinup</desc>
   </entry>
 
+  <entry id="ice_leadfrac" modify_via_xml="HAMOCC_ICE_LEADFRAC">
+    <type>real</type>
+    <category>bgcnml</category>
+    <group>bgcnml</group>
+    <values>
+      <value>$HAMOCC_ICE_LEADFRAC</value>
+    </values>
+    <desc>Subgrid sea ice lead fraction, 0.0:no leads, 1.0:permeable ice cover</desc>
+  </entry>
+
   <entry id="inidic" is_inputdata="yes">
     <type>char</type>
     <category>bgcnml</category>

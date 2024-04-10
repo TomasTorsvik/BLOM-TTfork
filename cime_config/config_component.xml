@@ -189,6 +189,15 @@
       Requires module ecosys</desc>
   </entry>
 
+  <entry id="HAMOCC_ICE_LEADFRAC">
+    <type>real</type>
+    <valid_values/>
+    <default_value>0.02</default_value>
+    <group>run_component_blom</group>
+    <file>env_run.xml</file>
+    <desc>Subgrid sea ice lead fraction, 0.0:no leads, 1.0:permeable ice cover</desc>
+  </entry>
+
   <description>
     <desc compset="_BLOM"    >BLOM default:</desc>
     <desc compset="_BLOM%ECO">BLOM/Ecosystem:</desc>

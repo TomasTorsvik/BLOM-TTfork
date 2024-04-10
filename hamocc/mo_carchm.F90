@@ -73,7 +73,7 @@ contains
                               bl1,bl2,bl3,calcon,ox0,ox1,ox2,ox3,ox4,ox5,ox6,                      &
                               oxyco,tzero
     use mo_control_bgc, only: dtbgc,use_cisonew,use_natDIC,use_CFC,use_BROMO,                      &
-                              use_cisonew,use_sedbypass
+                              use_cisonew,use_sedbypass,ice_leadfrac
     use mo_param1_bgc,  only: ialkali,iatmo2,iatmco2,iatmdms,iatmn2,iatmn2o,ian2o,icalc,           &
                               idicsat,idms,igasnit,ioxygen,iphosph,                                &
                               isco212,isilica,                                                     &
@@ -123,6 +123,7 @@ contains
     real    :: Kh,Khd,K1,K2,Kb,K1p,K2p,K3p,Ksi,Kw,Ks1,Kf,Kspc,Kspa
     real    :: tc,ta,sit,pt,ah1,ac,cu,cb,cc,tc_sat
     real    :: omega
+    real    :: icelid
     real    :: atm_cfc11,atm_cfc12,atm_sf6,fact                    ! CFC
     real    :: sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf              ! CFC
     real    :: flx11,flx12,flxsf,a_11,a_12,a_sf                    ! CFC
@@ -301,20 +302,21 @@ contains
 
               ! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
               Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-              kwco2 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
-              kwo2  = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
-              kwn2  = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
-              kwdms = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5
-              kwn2o = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5
+              icelid = (1.-ice_leadfrac)*psicomo(i,j)   ! Effective ice blockage modified by subgrid lead fraction
+              kwco2 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
+              kwo2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
+              kwn2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
+              kwdms = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5
+              kwn2o = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5
               if (use_CFC) then
-                kw_11 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
-                kw_12 = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
-                kw_sf = (1.-psicomo(i,j)) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
+                kw_11 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
+                kw_12 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
+                kw_sf = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
               endif
               if (use_BROMO) then
                 ! Stemmler et al. (2015; Biogeosciences) Eq. (8)
                 !  1.e-2/3600 = conversion from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-                kw_bromo=(1.-psicomo(i,j)) * 1.e-2/3600. *                       &
+                kw_bromo=(1.-icelid) * 1.e-2/3600. *                       &
                      &   (0.222*pfu10(i,j)**2+0.33*pfu10(i,j))*(660./sch_bromo)**0.5
               endif
 
