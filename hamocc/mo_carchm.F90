@@ -302,7 +302,14 @@ contains
 
               ! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
               Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-              icelid = (1.-ice_leadfrac)*psicomo(i,j)   ! Effective ice blockage modified by subgrid lead fraction
+              ! icelid: Effective ice blockage modified by subgrid lead fraction
+              if pfu10(i,j) < 6. then        ! convective conditions
+                icelid = (1.-ice_leadfrac)*psicomo(i,j)
+              else if pfu10(i,j) > 10. then  ! non-convective conditions
+                icelid = (1.-0.3*ice_leadfrac)*psicomo(i,j)
+              else                            ! transitional conditions
+                icelid = (1.- (1.-((pfu10(i,j)-6.)/4.)*0.7)*ice_leadfrac)*psicomo(i,j)
+              endif
               kwco2 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
               kwo2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
               kwn2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
