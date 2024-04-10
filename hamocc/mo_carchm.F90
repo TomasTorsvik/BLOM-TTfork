@@ -31,7 +31,7 @@ module mo_carchm
 contains
 
   subroutine carchm(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,prho,pglat,omask,psicomo,ppao,pfu10,     &
-       &            ptho,psao)
+       &            ptho,psao,hflx_mltfz)
 
     !***********************************************************************************************
     ! Inorganic carbon cycle including dissolution of CaCO3 and air-sea gass exchange
@@ -107,6 +107,7 @@ contains
     real,    intent(in) :: pfu10(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)          ! forcing field wind speed.
     real,    intent(in) :: ptho(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd,kpke)      ! potential temperature.
     real,    intent(in) :: psao(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd,kpke)      ! salinity [psu].
+    real,    intent(in) :: hflx_mltfz(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)     ! Heat flux due to melting/freezing [W m-2] (positive downwards)
 
     ! Local variables
     integer, parameter :: niter=20
@@ -302,14 +303,19 @@ contains
 
               ! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
               Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-              ! icelid: Effective ice blockage modified by subgrid lead fraction
-              if (pfu10(i,j) < 6.) then        ! convective conditions
-                icelid = (1.-ice_leadfrac)*psicomo(i,j)
-              else if (pfu10(i,j) > 10.) then  ! non-convective conditions
+              !!--- define icelid: Effective ice blockage modified by subgrid lead fraction
+              if (pfu10(i,j) < 6.) then
+                if (hflx_mltfz(i,j) < 0.) then   ! default formulation
+                  icelid = (1.-ice_leadfrac)*psicomo(i,j)
+                else                             ! convective conditions
+                  icelid = max(0., 1.-2*ice_leadfrac)*psicomo(i,j)
+                end if
+              else if (pfu10(i,j) > 10.) then    ! non-convective conditions
                 icelid = (1.-0.3*ice_leadfrac)*psicomo(i,j)
-              else                            ! transitional conditions
+              else                               ! transitional conditions
                 icelid = (1.- (1.-((pfu10(i,j)-6.)/4.)*0.7)*ice_leadfrac)*psicomo(i,j)
               endif
+              !!--- end define icelid
               kwco2 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
               kwo2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
               kwn2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5

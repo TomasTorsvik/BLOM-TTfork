@@ -33,7 +33,7 @@ contains
     use mod_time,       only: date,nday_of_year,nstep,nstep_in_day
     use mod_grid,       only: plat
     use mod_state,      only: temp,saln
-    use mod_forcing,    only: swa,slp,abswnd,atmco2,flxco2,flxdms,atmbrf,flxbrf
+    use mod_forcing,    only: swa,slp,abswnd,atmco2,flxco2,flxdms,atmbrf,flxbrf,hmltfz
     use mod_seaice,     only: ficem
     use mo_bgcmean,     only: nbgc,bgcwrt, diagfq_bgc,diagmon_bgc,diagann_bgc
     use mo_intfcblom,   only: bgc_dx,bgc_dy,bgc_dp,bgc_rho,omask,blom2hamocc,hamocc2blom
@@ -80,7 +80,7 @@ contains
     call hamocc4bcm(idm,jdm,kdm,nbdy,date%year,date%month,date%day,ldtday,bgc_dx,bgc_dy,bgc_dp,    &
          &          bgc_rho,plat,omask,dust,rivflx,ndep,oafx,pi_ph,swa,ficem,slp,abswnd,           &
          &          temp(1-nbdy,1-nbdy,1+nn),saln(1-nbdy,1-nbdy,1+nn),                             &
-         &          atmco2,flxco2,flxdms,atmbrf,flxbrf)
+         &          atmco2,flxco2,flxdms,atmbrf,flxbrf,hmltfz)
 
     !
     ! --- accumulate fields and write output

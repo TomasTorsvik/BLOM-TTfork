@@ -27,7 +27,7 @@ contains
 
   subroutine hamocc4bcm(kpie,kpje,kpke,kbnd,kplyear,kplmon,kplday,kldtday,pdlxp,pdlyp,pddpo,prho,  &
                         pglat,omask, dust,rivin,ndep,oafx,pi_ph,pfswr,psicomo,ppao,pfu10,ptho,psao,&
-                        patmco2,pflxco2,pflxdms,patmbromo,pflxbromo)
+                        patmco2,pflxco2,pflxdms,patmbromo,pflxbromo,hflx_mltfz)
 
     !***********************************************************************************************
     ! Main routine of iHAMOCC.
@@ -101,6 +101,7 @@ contains
     real,    intent(out) :: pflxdms(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)      ! DMS flux [kg/m^2/s].
     real,    intent(in)  :: patmbromo(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)    ! atmospheric bromoform concentration [ppt] used in fully coupled mode.
     real,    intent(out) :: pflxbromo(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)    ! Bromoform flux [kg/m^2/s].
+    real,    intent(in)  :: hflx_mltfz(1-kbnd:kpie+kbnd,1-kbnd:kpje+kbnd)   ! Heat flux due to melting/freezing [W m-2] (positive downwards)
 
     ! Local variables
     integer :: i,j,k,l
@@ -232,7 +233,7 @@ contains
       call inventory_bgc(kpie,kpje,kpke,pdlxp,pdlyp,pddpo,omask,0)
     endif
 
-    call carchm(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,prho,pglat,omask,psicomo,ppao,pfu10,ptho,psao)
+    call carchm(kpie,kpje,kpke,kbnd,pdlxp,pdlyp,pddpo,prho,pglat,omask,psicomo,ppao,pfu10,ptho,psao,hflx_mltfz)
 
     if (use_PBGC_CK_TIMESTEP   ) then
       if (mnproc.eq.1) then
