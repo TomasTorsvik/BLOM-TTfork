@@ -36,7 +36,7 @@ module mod_tracers
    integer, parameter :: ntrocn = 0
 
    ! Number of age tracers.
-   integer, parameter :: natr = 0
+   integer, parameter :: natr = 1
 
    ! Number of turbulent kinetic energy and generic length scale tracers.
 #ifdef TKE
