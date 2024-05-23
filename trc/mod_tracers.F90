@@ -33,7 +33,7 @@ module mod_tracers
 
    ! Number of ocean tracers, not including turbulent kinetic energy, generic
    ! length scale, ideal age and HAMOCC tracers.
-   integer, parameter :: ntrocn = 0
+   integer, parameter :: ntrocn = 2
 
    ! Number of age tracers.
    integer, parameter :: natr = 1
