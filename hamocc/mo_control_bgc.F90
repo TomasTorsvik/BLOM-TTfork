@@ -51,6 +51,18 @@ module mo_control_bgc
   real    :: rmasks = 0.0             !  value at wet cells in sediment.
   real    :: rmasko = 99999.00        !  value at wet cells in ocean.
 
+  ! Permissible gas exchange through sea ice, following
+  ! Steiner et al. (2013); JGR Oceans; DOI:10.1002/jgrc.20100
+  ! Include subgrid sea ice lead fraction for calculation of gas exchange in
+  ! areas with sea ice cover. The ice_leadfrac variable does not alter any
+  ! physical properties of the sea ice, only the ability of sea ice to block
+  ! exchanges between ocean and atmosphere.
+  ! ice_leadfrac = 0.0 : no subgrid leads; ice_leadfrac = 1.0 : fully permeable ice cover
+  ! Default value set to 0.02, which is lower than estimates for the Arctic
+  ! Ocean 2002-2020 of (min: 2.06%; max: 3.18%; average: 2.59%), following
+  ! Li et a. (2022); Remote Sens.; DOI:10.3390/rs14040969; Table 1
+  real    :: ice_leadfrac = 0.02      !  subgrid sea ice lead fraction (set via namelist)
+
   ! Variables set via namelist bgcnml
   logical           :: l_3Dvarsedpor          = .false. ! apply spatially variable sediment porosity
   logical           :: do_ndep                = .true.  ! apply n-deposition
