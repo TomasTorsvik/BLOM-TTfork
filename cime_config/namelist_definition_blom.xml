@@ -3631,12 +3631,22 @@
     <desc>Number of subcyles per time-step for sediment spinup</desc>
   </entry>
 
-  <entry id="ice_leadfrac" modify_via_xml="HAMOCC_ICE_LEADFRAC">
+  <entry id="icecover_exchange" modify_via_xml="HAMOCC_ICECOVER_EXCHANGE">
+    <type>char</type>
+    <category>bgcnml</category>
+    <group>bgcnml</group>
+    <values>
+      <value>$HAMOCC_ICECOVER_EXCHANGE</value>
+    </values>
+    <desc>Air-sea exchange under sea-ice conditions: "default", "with_leadfrac", "fetch_limited"</desc>
+  </entry>
+
+  <entry id="icecover_leadfrac" modify_via_xml="HAMOCC_ICECOVER_LEADFRAC">
     <type>real</type>
     <category>bgcnml</category>
     <group>bgcnml</group>
     <values>
-      <value>$HAMOCC_ICE_LEADFRAC</value>
+      <value>$HAMOCC_ICECOVER_LEADFRAC</value>
     </values>
     <desc>Subgrid sea ice lead fraction, 0.0:no leads, 1.0:permeable ice cover</desc>
   </entry>
