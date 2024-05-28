@@ -41,7 +41,8 @@ contains
     use mod_tracers,    only: ntrbgc,ntr,itrbgc,trc
     use mo_control_bgc, only: bgc_namelist,get_bgc_namelist,do_ndep,do_rivinpt,do_oalk,            &
                               do_sedspinup,sedspin_yr_s,sedspin_yr_e,sedspin_ncyc,                 &
-                              dtb,dtbgc,io_stdo_bgc,ldtbgc,ice_leadfrac,                           &
+                              dtb,dtbgc,io_stdo_bgc,ldtbgc,                                        &
+                              icecover_exchange,icecover_leadfrac,                                 &
                               ldtrunbgc,ndtdaybgc,with_dmsph,l_3Dvarsedpor,                        &
                               ocn_co2_type, use_sedbypass, use_BOXATM, use_BROMO
     use mo_param1_bgc,  only: ks,init_por2octra_mapping
@@ -74,7 +75,8 @@ contains
     real    :: sed_por(idm,jdm,ks) = 0.
 
     namelist /bgcnml/ atm_co2,fedepfile,do_rivinpt,rivinfile,do_ndep,ndepfile,do_oalk,             &
-         &            do_sedspinup,sedspin_yr_s,sedspin_yr_e,sedspin_ncyc,ice_leadfrac,            &
+         &            do_sedspinup,sedspin_yr_s,sedspin_yr_e,sedspin_ncyc,                         &
+         &            icecover_exchange,icecover_leadfrac,                                         &
          &            inidic,inialk,inipo4,inioxy,inino3,inisil,inid13c,inid14c,swaclimfile,       &
          &            with_dmsph,pi_ph_file,l_3Dvarsedpor,sedporfile,ocn_co2_type
     !

@@ -51,6 +51,12 @@ module mo_control_bgc
   real    :: rmasks = 0.0             !  value at wet cells in sediment.
   real    :: rmasko = 99999.00        !  value at wet cells in ocean.
 
+  ! Type of icecover formulation to use for air-sea exchanges under sea-ice conditions
+  ! "default" : limited by sea-ice concentration
+  ! "with_leadfrac" : modified by a minimum lead fraction
+  ! "fetch_limited" : reduced air-sea exchanges under strong wind conditions
+  character(len=64) :: icecover_exchange = 'default'
+
   ! Permissible gas exchange through sea ice, following
   ! Steiner et al. (2013); JGR Oceans; DOI:10.1002/jgrc.20100
   ! Include subgrid sea ice lead fraction for calculation of gas exchange in
@@ -61,7 +67,7 @@ module mo_control_bgc
   ! Default value set to 0.02, which is lower than estimates for the Arctic
   ! Ocean 2002-2020 of (min: 2.06%; max: 3.18%; average: 2.59%), following
   ! Li et a. (2022); Remote Sens.; DOI:10.3390/rs14040969; Table 1
-  real    :: ice_leadfrac = 0.02      !  subgrid sea ice lead fraction (set via namelist)
+  real    :: icecover_leadfrac = 0.02 !  subgrid sea ice lead fraction (set via namelist)
 
   ! Variables set via namelist bgcnml
   logical           :: l_3Dvarsedpor          = .false. ! apply spatially variable sediment porosity
