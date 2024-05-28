@@ -198,7 +198,16 @@
       Requires module ecosys</desc>
   </entry>
 
-  <entry id="HAMOCC_ICE_LEADFRAC">
+  <entry id="HAMOCC_ICECOVER_EXCHANGE">
+    <type>char</type>
+    <valid_values>default,with_leadfrac,fetch_limited</valid_values>
+    <default_value>default</default_value>
+    <group>run_component_blom</group>
+    <file>env_run.xml</file>
+    <desc>Air-sea exchange under sea-ice conditions: "default", "with_leadfrac", "fetch_limited"</desc>
+  </entry>
+
+  <entry id="HAMOCC_ICECOVER_LEADFRAC">
     <type>real</type>
     <valid_values/>
     <default_value>0.02</default_value>
