@@ -85,6 +85,8 @@ def buildnml(case, caseroot, compname):
     hamocc_sedspinup_yr_start = case.get_value("HAMOCC_SEDSPINUP_YR_START")
     hamocc_sedspinup_yr_end   = case.get_value("HAMOCC_SEDSPINUP_YR_END")
     hamocc_sedspinup_ncycle   = case.get_value("HAMOCC_SEDSPINUP_NCYCLE")
+    hamocc_icecover_exchange  = case.get_value("HAMOCC_ICECOVER_EXCHANGE")
+    hamocc_icecover_leadfrac  = case.get_value("HAMOCC_ICECOVER_LEADFRAC")
     is_test                   = case.get_value("TEST")
 
     blom_vcoord = case.get_value("BLOM_VCOORD")
@@ -189,6 +191,8 @@ def buildnml(case, caseroot, compname):
         config["hamocc_sedspinup_yr_start"] = hamocc_sedspinup_yr_start
         config["hamocc_sedspinup_yr_end"] = hamocc_sedspinup_yr_end
         config["hamocc_sedspinup_ncycle"] = hamocc_sedspinup_ncycle
+        config["hamocc_icecover_exchange"] = hamocc_icecover_exchange
+        config["hamocc_icecover_leadfrac"] = hamocc_icecover_leadfrac
         config["is_test"] = "yes" if is_test else "no"
 
         # TODO: the following needs to have new ways to turn this to "yes"
@@ -211,7 +215,8 @@ def buildnml(case, caseroot, compname):
         var_list = ('DIN_LOC_ROOT', 'RUN_TYPE', 'BLOM_VCOORD', 'BLOM_NDEP_SCENARIO',
                     'CCSM_CO2_PPMV', 'OCN_CO2_TYPE',
                     'HAMOCC_SEDSPINUP_YR_START', 'HAMOCC_SEDSPINUP_YR_END',
-                    'HAMOCC_SEDSPINUP_NCYCLE', 'HAMOCC_ICE_LEADFRAC')
+                    'HAMOCC_SEDSPINUP_NCYCLE', 'HAMOCC_ICECOVER_EXCHANGE',
+                    'HAMOCC_ICECOVER_LEADFRAC')
         for item in var_list:
             case_dict[item] = case.get_value(item)
 

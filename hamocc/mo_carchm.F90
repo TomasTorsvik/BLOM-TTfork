@@ -73,7 +73,7 @@ contains
                               bl1,bl2,bl3,calcon,ox0,ox1,ox2,ox3,ox4,ox5,ox6,                      &
                               oxyco,tzero
     use mo_control_bgc, only: dtbgc,use_cisonew,use_natDIC,use_CFC,use_BROMO,                      &
-                              use_cisonew,use_sedbypass,ice_leadfrac
+                              use_cisonew,use_sedbypass,icecover_exchange,icecover_leadfrac
     use mo_param1_bgc,  only: ialkali,iatmo2,iatmco2,iatmdms,iatmn2,iatmn2o,ian2o,icalc,           &
                               idicsat,idms,igasnit,ioxygen,iphosph,                                &
                               isco212,isilica,                                                     &
@@ -123,7 +123,9 @@ contains
     real    :: Kh,Khd,K1,K2,Kb,K1p,K2p,K3p,Ksi,Kw,Ks1,Kf,Kspc,Kspa
     real    :: tc,ta,sit,pt,ah1,ac,cu,cb,cc,tc_sat
     real    :: omega
-    real    :: icelid
+    real    :: icecoeff                                            ! Exchange modifier due to sea ice: 0. = no exchange; 1. = free exchange
+    real    :: icecover                                            ! Effective icecover blockage of air-sea exchanges
+    real    :: ice_fetchlim                                        ! Reduced exchange due to fetch limitation under sea-ice conditions
     real    :: atm_cfc11,atm_cfc12,atm_sf6,fact                    ! CFC
     real    :: sch_11,sch_12,sch_sf,kw_11,kw_12,kw_sf              ! CFC
     real    :: flx11,flx12,flxsf,a_11,a_12,a_sf                    ! CFC
@@ -302,28 +304,50 @@ contains
 
               ! Transfer (piston) velocity kw according to Wanninkhof (2014), in units of ms-1
               Xconvxa = 6.97e-07   ! Wanninkhof's a=0.251 converted from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-              ! icelid: Effective ice blockage modified by subgrid lead fraction
-              if (pfu10(i,j) < 6.) then        ! convective conditions
-                icelid = (1.-ice_leadfrac)*psicomo(i,j)
-              else if (pfu10(i,j) > 10.) then  ! non-convective conditions
-                icelid = (1.-0.3*ice_leadfrac)*psicomo(i,j)
-              else                            ! transitional conditions
-                icelid = (1.- (1.-((pfu10(i,j)-6.)/4.)*0.7)*ice_leadfrac)*psicomo(i,j)
+              ! Air-sea exchange reduction under sea-ice conditions
+              if (psicomo(i,j) == 0.) then
+                 icecoeff = 1.     ! No icecover
+              else
+                 select case (trim(icecover_exchange))
+                 case ('with_leadfrac')
+                    ! icecover reduced by lead fraction, following Steiner et al. (2013); no fetch limitation
+                    icecover = (1. - icecover_leadfrac)*psicomo(i,j)
+                    icecoeff = 1. - icecover
+                 case ('fetch_limited')
+                    ! icecover limited by minimum lead fraction; reduced exchange due to fetch limitation
+                    icecover = max((1. - icecover_leadfrac), psicomo(i,j))
+                    if (pfu10(i,j) < 6.) then        ! convective conditions
+                       ice_fetchlim = 1.
+                    else if (pfu10(i,j) > 10.) then  ! fetch limited condition : k_seaice = 0.713*k_ocean
+                       ! k_eff = [(1-icecover)*k_ocean + icecover*k_seaice]
+                       !       = [(1-icecover) + 0.713*icecover]*k_ocean
+                       !       = [1 - 0.287*icecover]*k_ocean
+                       ice_fetchlim = 1. - 0.287*icecover
+                    else
+                       ! Linear combination of pfu10 < 6. and pfu10 > 10. conditions
+                       ice_fetchlim = 1. - 0.287*icecover*((pfu10(i,j)-6.)/4.)
+                    endif
+                    icecoeff = (1. - icecover) * ice_fetchlim
+                 case default
+                    ! icecover equivalent to sea ice concentration; no fetch limitation
+                    icecoeff = 1. - psicomo(i,j)
+                 end select
               endif
-              kwco2 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
-              kwo2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
-              kwn2  = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
-              kwdms = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5
-              kwn2o = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5
+
+              kwco2 = icecoeff * Xconvxa * pfu10(i,j)**2*(660./scco2)**0.5
+              kwo2  = icecoeff * Xconvxa * pfu10(i,j)**2*(660./sco2)**0.5
+              kwn2  = icecoeff * Xconvxa * pfu10(i,j)**2*(660./scn2)**0.5
+              kwdms = icecoeff * Xconvxa * pfu10(i,j)**2*(660./scdms)**0.5
+              kwn2o = icecoeff * Xconvxa * pfu10(i,j)**2*(660./scn2o)**0.5
               if (use_CFC) then
-                kw_11 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
-                kw_12 = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
-                kw_sf = (1.-icelid) * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
+                kw_11 = icecoeff * Xconvxa * pfu10(i,j)**2*(660./sch_11)**0.5
+                kw_12 = icecoeff * Xconvxa * pfu10(i,j)**2*(660./sch_12)**0.5
+                kw_sf = icecoeff * Xconvxa * pfu10(i,j)**2*(660./sch_sf)**0.5
               endif
               if (use_BROMO) then
                 ! Stemmler et al. (2015; Biogeosciences) Eq. (8)
                 !  1.e-2/3600 = conversion from [cm hr-1]/[m s-1]^2 to [ms-1]/[m s-1]^2
-                kw_bromo=(1.-icelid) * 1.e-2/3600. *                       &
+                kw_bromo=icecoeff * 1.e-2/3600. *                                    &
                      &   (0.222*pfu10(i,j)**2+0.33*pfu10(i,j))*(660./sch_bromo)**0.5
               endif
 
