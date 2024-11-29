@@ -32,7 +32,7 @@ module mod_cesm
                           lamult, lasl, ustokes, vstokes, atmco2, atmbrf, &
                           flxdms, flxbrf
    use mod_ben02, only: initai, rdcsic, rdctsf, fnlzai
-   use mod_seaice, only: ficem
+   use mod_seaice, only: ficem, ficems
    use mod_checksum, only: csdiag, chksummsk
 #ifdef HAMOCC
    use mo_control_bgc, only: use_bromo
@@ -75,6 +75,7 @@ module mod_cesm
       slp_da, &          ! Sea-level pressure [kg m-1 s-2].
       abswnd_da, &       ! Wind speed at measurement height (zu) [m s-1].
       ficem_da, &        ! Ice concentration [].
+      ficems_da, &       ! Ice concentration, modified by salinity [].
       lamult_da, &       ! Langmuir enhancement factor [].
       lasl_da, &         ! Surface layer averaged Langmuir number [].
       ustokes_da, &      ! u-component of surface Stokes drift [m s-1].
@@ -93,9 +94,9 @@ module mod_cesm
    public :: runid_cesm, runtyp_cesm, ocn_cpl_dt_cesm, nstep_in_cpl, hmlt, &
              frzpot, mltpot, swa_da, nsf_da, hmlt_da, lip_da, sop_da, eva_da, &
              rnf_da, rfi_da, fmltfz_da, sfl_da, ztx_da, mty_da, ustarw_da, &
-             slp_da, abswnd_da, ficem_da, lamult_da, lasl_da, flxdms_da, flxbrf_da, &
-             ustokes_da, vstokes_da, atmco2_da, atmbrf_da, smtfrc, l1ci, l2ci, &
-             inicon_cesm, inifrc_cesm, getfrc_cesm
+             slp_da, abswnd_da, ficem_da, ficems_da, lamult_da, lasl_da, flxdms_da, &
+             flxbrf_da, ustokes_da, vstokes_da, atmco2_da, atmbrf_da, smtfrc, l1ci, &
+             l2ci, inicon_cesm, inifrc_cesm, getfrc_cesm
 contains
 
    subroutine inicon_cesm
@@ -188,6 +189,7 @@ contains
            slp(i, j)     = w1*slp_da(i, j, l1ci)     + w2*slp_da(i, j, l2ci)
            abswnd(i, j)  = w1*abswnd_da(i, j, l1ci)  + w2*abswnd_da(i, j, l2ci)
            ficem(i, j)   = w1*ficem_da(i, j, l1ci)   + w2*ficem_da(i, j, l2ci)
+           ficems(i, j)  = w1*ficems_da(i, j, l1ci)  + w2*ficems_da(i, j, l2ci)
            lamult(i, j)  = w1*lamult_da(i, j, l1ci)  + w2*lamult_da(i, j, l2ci)
            lasl(i, j)    = w1*lasl_da(i, j, l1ci)    + w2*lasl_da(i, j, l2ci)
            ustokes(i, j) = w1*ustokes_da(i, j, l1ci) + w2*ustokes_da(i, j, l2ci)
@@ -227,6 +229,7 @@ contains
       call ncdefvar('slp_da', 'x y', ndouble, 8)
       call ncdefvar('abswnd_da', 'x y', ndouble, 8)
       call ncdefvar('ficem_da', 'x y', ndouble, 8)
+      call ncdefvar('ficems_da', 'x y', ndouble, 8)
       call ncdefvar('lamult_da', 'x y', ndouble, 8)
       call ncdefvar('lasl_da', 'x y', ndouble, 8)
       call ncdefvar('ustokes_da', 'x y', ndouble, 8)
@@ -264,6 +267,8 @@ contains
       call ncwrtr('abswnd_da', 'x y', abswnd_da(1 - nbdy, 1 - nbdy, l2ci), &
                   ip, 1, 1._r8, 0._r8, 8)
       call ncwrtr('ficem_da', 'x y', ficem_da(1 - nbdy, 1 - nbdy, l2ci), &
+                  ip, 1, 1._r8, 0._r8, 8)
+      call ncwrtr('ficems_da', 'x y', ficems_da(1 - nbdy, 1 - nbdy, l2ci), &
                   ip, 1, 1._r8, 0._r8, 8)
       call ncwrtr('lamult_da', 'x y', lamult_da(1 - nbdy, 1 - nbdy, l2ci), &
                   ip, 1, 1._r8, 0._r8, 8)
@@ -306,6 +311,7 @@ contains
          call chksummsk(slp, ip, 1, 'slp')
          call chksummsk(abswnd, ip, 1, 'abswnd')
          call chksummsk(ficem, ip, 1, 'ficem')
+         call chksummsk(ficems, ip, 1, 'ficems')
          call chksummsk(lamult, ip, 1, 'lamult')
          call chksummsk(lasl, ip, 1, 'lasl')
          call chksummsk(ustokes, ip, 1, 'ustokes')

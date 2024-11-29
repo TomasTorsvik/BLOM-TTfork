@@ -34,7 +34,7 @@ contains
     use mod_grid,       only: plat
     use mod_state,      only: temp,saln
     use mod_forcing,    only: swa,slp,abswnd,atmco2,flxco2,flxdms,atmbrf,flxbrf
-    use mod_seaice,     only: ficem
+    use mod_seaice,     only: ficems
     use mo_bgcmean,     only: nbgc,bgcwrt, diagfq_bgc,diagmon_bgc,diagann_bgc
     use mo_intfcblom,   only: bgc_dx,bgc_dy,bgc_dp,bgc_rho,omask,blom2hamocc,hamocc2blom
     use mo_read_rivin,  only: rivflx
@@ -78,7 +78,7 @@ contains
     if(with_dmsph) call get_pi_ph(idm,jdm,date%month)
 
     call hamocc4bcm(idm,jdm,kdm,nbdy,date%year,date%month,date%day,ldtday,bgc_dx,bgc_dy,bgc_dp,    &
-         &          bgc_rho,plat,omask,dust,rivflx,ndep,oafx,pi_ph,swa,ficem,slp,abswnd,           &
+         &          bgc_rho,plat,omask,dust,rivflx,ndep,oafx,pi_ph,swa,ficems,slp,abswnd,          &
          &          temp(1-nbdy,1-nbdy,1+nn),saln(1-nbdy,1-nbdy,1+nn),                             &
          &          atmco2,flxco2,flxdms,atmbrf,flxbrf)
 
