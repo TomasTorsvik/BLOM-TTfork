@@ -56,12 +56,12 @@ c
      .                    lip_da, sop_da, eva_da, rnf_da, rfi_da,
      .                    fmltfz_da, sfl_da, ztx_da, mty_da, ustarw_da,
      .                    slp_da, abswnd_da, atmco2_da, atmbrf_da,
-     .                    ficem_da, l1ci, l2ci
+     .                    ficem_da, ficems_da, l1ci, l2ci
       use mod_ben02, only: cd_d, ch_d, ce_d, wg2_d, cd_m, ch_m, ce_m,
      .                     wg2_m, rhoa, tsi_tda, tml_tda, sml_tda,
      .                     alb_tda, fice_tda, ntda, rnfres
       use mod_thdysi, only: tsrfm, ticem
-      use mod_seaice, only: ficem, hicem, hsnwm, iagem
+      use mod_seaice, only: ficem, ficems, hicem, hsnwm, iagem
       use mod_temmin, only: settemmin
 #if defined(TRC) && (defined(TKE) || defined(IDLAGE))
       use mod_tracers, only: itrtke, itrgls, itriag, trc
@@ -471,6 +471,7 @@ c
       call ncread('ustar',ustar,ip,1,0.)
       call ncread('kfpla',rkfpla,ip,1,0.)
       call ncread('ficem',ficem,ip,1,0.)
+      call ncread('ficems',ficems,ip,1,0.)
 c
       vexist=ncinqv('uml')
 !      call xcbcst(vexist)
@@ -599,6 +600,7 @@ c
           call ncread('hmlt_da',hmlt_da,ip,1,0.)
           call ncread('slp_da',slp_da,ip,1,0.)
           call ncread('ficem_da',ficem_da,ip,1,0.)
+          call ncread('ficems_da',ficems_da,ip,1,0.)
           call ncread('abswnd_da',abswnd_da,ip,1,0.)
           call ncread('atmco2_da',atmco2_da,ip,1,0.)
           call ncgeti('l2ci',l2ci)

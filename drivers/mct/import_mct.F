@@ -30,7 +30,8 @@
       use mod_cesm, only: swa_da, nsf_da, hmlt_da, lip_da, sop_da,
      .                    eva_da, rnf_da, rfi_da, fmltfz_da, sfl_da,
      .                    ztx_da, mty_da, ustarw_da, slp_da, abswnd_da,
-     .                    atmco2_da, atmbrf_da, ficem_da, l1ci, l2ci
+     .                    atmco2_da, atmbrf_da, ficem_da, ficems_da,
+     .                    l1ci, l2ci
       use mod_utility, only: util1, util2
       use mod_checksum, only: csdiag, chksummsk
       use blom_cpl_indices
@@ -145,6 +146,7 @@
                hmlt_da(i,j,l2ci) = mval
                slp_da(i,j,l2ci) = mval
                ficem_da(i,j,l2ci) = mval
+               ficems_da(i,j,l2ci) = mval
                abswnd_da(i,j,l2ci) = mval
             elseif (cplmsk(i,j) == 0) then
                lip_da(i,j,l2ci) = 0._r8
@@ -159,6 +161,7 @@
                hmlt_da(i,j,l2ci) = 0._r8
                slp_da(i,j,l2ci) = fval
                ficem_da(i,j,l2ci) = fval
+               ficems_da(i,j,l2ci) = fval
                abswnd_da(i,j,l2ci) = fval
             else
 
@@ -205,6 +208,10 @@
                ! Ice fraction []
                ficem_da(i,j,l2ci) = x2o_o%rAttr(index_x2o_Si_ifrac,n)
 
+               ! Tomas: Temporary fix: set ficems_da = ficem_da
+               ! Ice fraction, modified by salinity []
+               ficems_da(i,j,l2ci) = ficem_da(i,j,l2ci)
+
                ! 10m wind speed [m/s]
                abswnd_da(i,j,l2ci) =
      .            sqrt(x2o_o%rAttr(index_x2o_So_duu10n,n))
@@ -231,6 +238,8 @@
      .                 slp_da(1-nbdy,1-nbdy,l2ci))
       call fill_global(mval, fval, halo_ps,
      .                 ficem_da(1-nbdy,1-nbdy,l2ci))
+      call fill_global(mval, fval, halo_ps,
+     .                 ficems_da(1-nbdy,1-nbdy,l2ci))
       call fill_global(mval, fval, halo_ps,
      .                 abswnd_da(1-nbdy,1-nbdy,l2ci))
 
@@ -360,6 +369,7 @@
          call chksummsk(hmlt_da(1-nbdy,1-nbdy,l2ci),ip,1,'hmlt')
          call chksummsk(slp_da(1-nbdy,1-nbdy,l2ci),ip,1,'slp')
          call chksummsk(ficem_da(1-nbdy,1-nbdy,l2ci),ip,1,'ficem')
+         call chksummsk(ficems_da(1-nbdy,1-nbdy,l2ci),ip,1,'ficems')
          call chksummsk(abswnd_da(1-nbdy,1-nbdy,l2ci),ip,1,'abswnd')
          call chksummsk(atmco2_da(1-nbdy,1-nbdy,l2ci),ip,1,'atmco2')
          call chksummsk(atmbrf_da(1-nbdy,1-nbdy,l2ci),ip,1,'atmbrf')
