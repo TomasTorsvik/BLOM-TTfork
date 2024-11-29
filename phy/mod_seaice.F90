@@ -32,6 +32,7 @@ module mod_seaice
 
    real(r8), dimension(1 - nbdy:idm + nbdy, 1 - nbdy:jdm + nbdy) :: &
       ficem, &   ! Sea-ice concentration [].
+      ficems, &  ! Sea-ice concentration, modified by salinity [].
       hicem, &   ! Sea-ice thickness [m].
       hsnwm, &   ! Snow thickness on sea ice [m].
       ustari, &  ! Friction velocity at ocean and sea ice interface [m s-1].
@@ -41,7 +42,7 @@ module mod_seaice
       vicem, &   ! y-component of sea-ice velocity [m s-1].
       iagem      ! Age of sea ice [days].
 
-   public :: ficem, hicem, hsnwm, ustari, tauxice, tauyice, uicem, vicem, &
+   public :: ficem, ficems, hicem, hsnwm, ustari, tauxice, tauyice, uicem, vicem, &
              iagem, inivar_seaice
 
 contains
@@ -57,6 +58,7 @@ contains
       do j = 1 - nbdy, jj + nbdy
          do i = 1 - nbdy, ii + nbdy
             ficem(i, j) = spval
+            ficems(i, j) = spval
             hicem(i, j) = spval
             hsnwm(i, j) = spval
             ustari(i, j) = spval
