@@ -210,7 +210,8 @@
 
                ! Tomas: Temporary fix: set ficems_da = ficem_da
                ! Ice fraction, modified by salinity []
-               ficems_da(i,j,l2ci) = ficem_da(i,j,l2ci)
+               !ficems_da(i,j,l2ci) = ficem_da(i,j,l2ci)
+               ficems_da(i,j,l2ci) = x2o_o%rAttr(index_x2o_Si_sisal,n)
 
                ! 10m wind speed [m/s]
                abswnd_da(i,j,l2ci) =
