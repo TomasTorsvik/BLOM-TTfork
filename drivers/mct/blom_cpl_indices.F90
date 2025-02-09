@@ -48,6 +48,7 @@ module blom_cpl_indices
   ! drv -> ocn
 
   integer :: index_x2o_Si_ifrac        ! fractional ice wrt ocean
+  integer :: index_x2o_Si_sisal        ! sea ice salinity
   integer :: index_x2o_So_duu10n       ! 10m wind speed squared           (m^2/s^2)
   integer :: index_x2o_Sa_pslv         ! sea-level pressure               (Pa)
   integer :: index_x2o_Sa_co2prog      ! bottom atm level prognostic CO2
@@ -130,6 +131,7 @@ contains
     index_o2x_Faoo_fdms_ocn = mct_avect_indexra(o2x,'Faoo_fdms_ocn',perrWith='quiet')
     index_o2x_Faoo_fbrf_ocn = mct_avect_indexra(o2x,'Faoo_fbrf_ocn',perrWith='quiet')
     index_x2o_Si_ifrac      = mct_avect_indexra(x2o,'Si_ifrac')
+    index_x2o_Si_sisal      = mct_avect_indexra(x2o,'Si_sisal')
     index_x2o_Sa_pslv       = mct_avect_indexra(x2o,'Sa_pslv')
     index_x2o_So_duu10n     = mct_avect_indexra(x2o,'So_duu10n')
     ! QL, 150526, from wav
