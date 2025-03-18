@@ -471,7 +471,17 @@ c
       call ncread('ustar',ustar,ip,1,0.)
       call ncread('kfpla',rkfpla,ip,1,0.)
       call ncread('ficem',ficem,ip,1,0.)
-      call ncread('ficems',ficems,ip,1,0.)
+c
+      vexist=ncinqv('ficems')
+!      call xcbcst(vexist)
+      if (vexist) then
+        call ncread('ficems',ficems,ip,1,0.)
+      elseif (mnproc.eq.1) then
+        write (lp,*)
+     .   'Warning: field ''ficems'' is not read from restart file and'
+        write (lp,*)
+     .   'will be initialized to zero.'
+      endif
 c
       vexist=ncinqv('uml')
 !      call xcbcst(vexist)
