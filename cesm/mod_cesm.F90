@@ -75,7 +75,7 @@ module mod_cesm
       slp_da, &          ! Sea-level pressure [kg m-1 s-2].
       abswnd_da, &       ! Wind speed at measurement height (zu) [m s-1].
       ficem_da, &        ! Ice concentration [].
-      ficems_da, &       ! Ice concentration, modified by salinity [].
+      ficems_da, &       ! Ice salinity [ppt].
       lamult_da, &       ! Langmuir enhancement factor [].
       lasl_da, &         ! Surface layer averaged Langmuir number [].
       ustokes_da, &      ! u-component of surface Stokes drift [m s-1].

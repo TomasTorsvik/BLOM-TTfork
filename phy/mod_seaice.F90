@@ -32,7 +32,7 @@ module mod_seaice
 
    real(r8), dimension(1 - nbdy:idm + nbdy, 1 - nbdy:jdm + nbdy) :: &
       ficem, &   ! Sea-ice concentration [].
-      ficems, &  ! Sea-ice concentration, modified by salinity [].
+      ficems, &  ! Sea-ice salinity [ppt].
       hicem, &   ! Sea-ice thickness [m].
       hsnwm, &   ! Snow thickness on sea ice [m].
       ustari, &  ! Friction velocity at ocean and sea ice interface [m s-1].

@@ -54,12 +54,12 @@ c
      .                    lip_da, sop_da, eva_da, rnf_da, rfi_da,
      .                    fmltfz_da, sfl_da, ztx_da, mty_da, ustarw_da,
      .                    slp_da, abswnd_da, atmco2_da, atmbrf_da,
-     .                    ficem_da, l2ci
+     .                    ficem_da, ficems_da, l2ci
       use mod_ben02, only: cd_d, ch_d, ce_d, wg2_d, cd_m, ch_m, ce_m,
      .                     wg2_m, rhoa, tsi_tda, tml_tda, sml_tda,
      .                     alb_tda, fice_tda, ntda, rnfres
       use mod_thdysi, only: tsrfm, ticem
-      use mod_seaice, only: ficem, hicem, hsnwm, iagem
+      use mod_seaice, only: ficem, ficems, hicem, hsnwm, iagem
 #if defined(TRC) && (defined(TKE) || defined(IDLAGE))
       use mod_tracers, only: itrtke, itrgls, itriag, trc
 #ifdef TKE
@@ -290,6 +290,7 @@ c
       call wrtrst('ustar',trim(c5p)//' time',ustar,ip)
       call wrtrst('kfpla',trim(c5p)//' k2 time',rkfpla,ip)
       call wrtrst('ficem',trim(c5p)//' time',ficem,ip)
+      call wrtrst('ficems',trim(c5p)//' time',ficems,ip)
       call wrtrst('uml',trim(c5u)//' k4 time',uml,iuu)
       call wrtrst('vml',trim(c5v)//' k4 time',vml,ivv)
       call wrtrst('umlres',trim(c5u)//' k2 time',umlres,iuu)
@@ -366,6 +367,7 @@ c
         call wrtrst('hmlt_da',trim(c5p)//' k2 time',hmlt_da,ip)
         call wrtrst('slp_da',trim(c5p)//' k2 time',slp_da,ip)
         call wrtrst('ficem_da',trim(c5p)//' k2 time',ficem_da,ip)
+        call wrtrst('ficems_da',trim(c5p)//' k2 time',ficems_da,ip)
         call wrtrst('abswnd_da',trim(c5p)//' k2 time',abswnd_da,ip)
         call wrtrst('atmco2_da',trim(c5p)//' k2 time',atmco2_da,ip)
         call wrtrst('atmbrf_da',trim(c5p)//' k2 time',atmbrf_da,ip)  ! not read in restart_rd, necesarry?
@@ -973,6 +975,7 @@ c
       call defvarrst('ustar',trim(c5p)//' time')
       call defvarrst('kfpla',trim(c5p)//' k2 time')
       call defvarrst('ficem',trim(c5p)//' time')
+      call defvarrst('ficems',trim(c5p)//' time')
       call defvarrst('uml',trim(c5u)//' k4 time')
       call defvarrst('vml',trim(c5v)//' k4 time')
       call defvarrst('umlres',trim(c5u)//' k2 time')
@@ -1047,6 +1050,7 @@ c
         call defvarrst('hmlt_da',trim(c5p)//' k2 time')
         call defvarrst('slp_da',trim(c5p)//' k2 time')
         call defvarrst('ficem_da',trim(c5p)//' k2 time')
+        call defvarrst('ficems_da',trim(c5p)//' k2 time')
         call defvarrst('abswnd_da',trim(c5p)//' k2 time')
         call defvarrst('atmco2_da',trim(c5p)//' k2 time')
         call defvarrst('atmbrf_da',trim(c5p)//' k2 time')
