@@ -565,13 +565,16 @@ contains
             else
               dms_ph  = 1._rp
             endif
+            ! DMS production: Kloster et al. (2006), Eq. (2) inserted Eq. (3)
             dmsprod = (dmsp5*delsil+dmsp4*delcar)*(1._rp+1._rp/(temp+dmsp1)**2)*dms_ph
             if (lkwrbioz_off) then
                dms_bac = 0._rp
             else
+               ! DMS decay, bacterial: Kloster et al. (2006), Eq. (6) inserted Eq. (7)
                dms_bac = dmsp3*abs(temp+3._rp)*ocetra(i,j,k,idms)                 &
                        &             *(ocetra(i,j,k,idms)/(dmsp6+ocetra(i,j,k,idms)))
             endif
+            ! DMS decay, photolysis: Kloster et al. (2006), Eq. (5) inserted Eq. (4)
             dms_uv  = dmsp2*phofa/pi_alpha*ocetra(i,j,k,idms)
 
             if (use_DOMclasses) then
