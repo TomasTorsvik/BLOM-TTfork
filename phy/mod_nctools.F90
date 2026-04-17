@@ -1217,8 +1217,8 @@ contains
     real :: scf,ofs,arng(2),fldmin,fldmax
     logical :: uvflg
     integer, dimension(maxdm) :: start,count
-    integer(i2), allocatable, dimension(:,:,:) :: fldout,fld_out
-    real, allocatable, dimension(:,:,:) ::rfld
+    integer(i2), allocatable, dimension(:,:,:) :: i2fld,fldout,fld_out
+    real, allocatable, dimension(:,:,:) :: rfld
     integer :: dimid,dimids(maxdm),strn,strind(2,maxdm)
     real, dimension(itdm,jtdm) :: rfldt
 
@@ -1349,7 +1349,7 @@ contains
         call ncerro(nfmpi_put_att_double(ncid,rhid,'add_offset',nf_double,clen,ofs))
         call ncerro(nfmpi_enddef(ncid))
       end if
-      allocate(rfld(ii,jj,kd))
+      allocate(i2fld(ii,jj,kd))
       allocate(fldout(ii,jj,kd))
       allocate(fld_out(itdm,jj,kd))
       fld_out = i2fill
@@ -1362,9 +1362,9 @@ contains
             do i = 1,ii
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               if (msk(ij) == 1) then
-                rfld(i,j,k) = nint(((fld(ij+(k-1)*ijdm)*sfac)+offs-ofs)/scf) - i2fill
+                i2fld(i,j,k) = nint(((fld(ij+(k-1)*ijdm)*sfac)+offs-ofs)/scf, i2) - i2fill
               else
-                rfld(i,j,k) = 0
+                i2fld(i,j,k) = 0
               end if
             end do
           end do
@@ -1378,9 +1378,9 @@ contains
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               ijk = ij+(k-1)*ijdm
               if (msk(ij) == 1.and.fld(ijk) /= fillr8) then
-                rfld(i,j,k) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
+                i2fld(i,j,k) = nint(((fld(ijk)*sfac)+offs-ofs)/scf, i2) - i2fill
               else
-                rfld(i,j,k) = 0
+                i2fld(i,j,k) = 0
               end if
             end do
           end do
@@ -1392,7 +1392,7 @@ contains
           do j = 1,jj
             do i = 1,ii
               ijk = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)+(k-1)*ijdm
-              rfld(i,j,k) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
+              i2fld(i,j,k) = nint(((fld(ijk)*sfac)+offs-ofs)/scf, i2) - i2fill
             end do
           end do
         end do
@@ -1403,7 +1403,7 @@ contains
       do k = 1,kd
         do j = 1,jj
           do i = 1,ii
-            fldout(i,j,k) = rfld(i,j,k)+i2fill
+            fldout(i,j,k) = i2fld(i,j,k) + i2fill
           end do
         end do
       end do
@@ -1412,7 +1412,7 @@ contains
       call ncerro(nfmpi_put_vara_int2_all(ncid,rhid,istart,icount,fld_out))
 
       if (mnproc == 1) write(lp,*) trim(vnm),arng
-      deallocate(rfld,fldout,fld_out)
+      deallocate(i2fld,fldout,fld_out)
 #endif
     else if(io_type  ==  0) then
       do n = 1,maxdm
@@ -1535,9 +1535,9 @@ contains
             do i = 1,ii
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               if (msk(ij) == 1) then
-                rfld(i,j,1) = nint(((fld(ij+(k-1)*ijdm)*sfac)+offs-ofs)/scf) - i2fill
+                rfld(i,j,1) = ((fld(ij+(k-1)*ijdm)*sfac)+offs-ofs)/scf - i2fill
               else
-                rfld(i,j,1) = 0
+                rfld(i,j,1) = 0.
               end if
             end do
           end do
@@ -1549,9 +1549,9 @@ contains
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               ijk = ij+(k-1)*ijdm
               if (msk(ij) == 1.and.fld(ijk) /= fillr8) then
-                rfld(i,j,1) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
+                rfld(i,j,1) = ((fld(ijk)*sfac)+offs-ofs)/scf - i2fill
               else
-                rfld(i,j,1) = 0
+                rfld(i,j,1) = 0.
               end if
             end do
           end do
@@ -1561,7 +1561,7 @@ contains
           do j = 1,jj
             do i = 1,ii
               ijk = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)+(k-1)*ijdm
-              rfld(i,j,1) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
+              rfld(i,j,1) = ((fld(ijk)*sfac)+offs-ofs)/scf - i2fill
             end do
           end do
           !$omp end parallel do
@@ -1571,7 +1571,7 @@ contains
           !$omp parallel do
           do j = 1,jtdm
             do i = 1,itdm
-              fldout(i,j,1) = rfldt(i,j)+i2fill
+              fldout(i,j,1) = nint(rfldt(i,j), i2) + i2fill
             end do
           end do
           !$omp end parallel do
