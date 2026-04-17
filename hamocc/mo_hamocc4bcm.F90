@@ -156,7 +156,9 @@ contains
       !$OMP PARALLEL DO PRIVATE(i)
       do  j=1,kpje
         do  i=1,kpie
-          atm(i,j,iatmco2)=patmco2(i,j)
+          if(omask(i,j) > 0.5_rp) then
+            atm(i,j,iatmco2)=patmco2(i,j)
+          endif
         enddo
       enddo
       !$OMP END PARALLEL DO
