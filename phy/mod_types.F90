@@ -42,11 +42,49 @@ module mod_types
    integer,parameter :: BLOM_CHAR_X = 512     ! extra-long char
    integer,parameter :: BLOM_CHAR_XX= 4096    ! extra-extra-long char
 
+   ! Define generic interface for realeq
+   interface realeq
+     module procedure realeq_single, realeq_double
+   end interface realeq
+
    public :: i1, i2, i4, i8, r4, r8,  &
         BLOM_CHAR_S,                  &
         BLOM_CHAR_M,                  &
         BLOM_CHAR_L,                  &
         BLOM_CHAR_X,                  &
-        BLOM_CHAR_XX
+        BLOM_CHAR_XX,                 &
+        realeq
 
+ contains
+
+   ! Compare single precision real (kind=r4)
+   logical function realeq_single(x, y, tol)
+     real(r4), intent(in) :: x, y
+     real(r4), intent(in), optional :: tol
+     real(r4) :: rtol
+     if (present(tol)) then
+       rtol = tol
+     else
+       ! Set default tolerance = 10*epsilon to account for
+       ! accumulated arithmetic errors
+       rtol = 10.0_r4 * epsilon(1.0_r4)
+     end if
+     realeq = abs(x-y) < rtol
+   end function realeq_single
+
+   ! Compare double precision real (kind=r8)
+   logical function realeq_double(x, y, tol)
+     real(r8), intent(in) :: x, y
+     real(r8), intent(in), optional :: tol
+     real(r8) :: rtol
+     if (present(tol)) then
+       rtol = tol
+     else
+       ! Set default tolerance = 10*epsilon to account for
+       ! accumulated arithmetic errors
+       rtol = 10.0_r8 * epsilon(1.0_r8)
+     end if
+     realeq = abs(x-y) < rtol
+   end function realeq_double
+   
 end module mod_types

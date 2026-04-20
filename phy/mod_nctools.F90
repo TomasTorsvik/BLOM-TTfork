@@ -97,7 +97,7 @@ module mod_nctools
   use mod_calendar, only: date_type, daynum_diff, calendar_noerr, &
                           calendar_errstr
   use netcdf
-  use mod_types,    only: i2, i4, r4
+  use mod_types,    only: i2, i4, r4, realeq
 
   implicit none
   public
@@ -1322,14 +1322,14 @@ contains
       call xcmin(fldmin)
       call xcmax(fldmax)
       if (uvflg) then
-        if (fldmin >= fldmax) then
+        if (realeq(fldmin,fldmax)) then
           scf = 1.d0
         else
           scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
         end if
         ofs = 0.d0
       else
-        if (fldmin >= fldmax) then
+        if (realeq(fldmin,fldmax)) then
           scf = 1.d0
         else
           scf = (fldmax-fldmin)/dble(2*i2max)
@@ -1377,7 +1377,7 @@ contains
             do i = 1,ii
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               ijk = ij+(k-1)*ijdm
-              if (msk(ij) == 1.and.fld(ijk) /= fillr8) then
+              if (msk(ij) == 1 .and. (.not.realeq(fld(ijk),fillr8))) then
                 rfld(i,j,k) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
               else
                 rfld(i,j,k) = 0
@@ -1472,7 +1472,7 @@ contains
             do i = 1,ii
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               ijk = ij+(k-1)*ijdm
-              if (msk(ij) == 1.and.fld(ijk) /= fillr8) then
+              if (msk(ij) == 1 .and. (.not.realeq(fld(ijk),fillr8))) then
                 fldmin = min(fldmin,(fld(ijk)*sfac)+offs)
                 fldmax = max(fldmax,(fld(ijk)*sfac)+offs)
               end if
@@ -1497,14 +1497,14 @@ contains
       call xcmin(fldmin)
       call xcmax(fldmax)
       if (uvflg) then
-        if (fldmin >= fldmax) then
+        if (realeq(fldmin,fldmax)) then
           scf = 1.d0
         else
           scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
         end if
         ofs = 0.d0
       else
-        if (fldmin >= fldmax) then
+        if (realeq(fldmin,fldmax)) then
           scf = 1.d0
         else
           scf = (fldmax-fldmin)/dble(2*i2max)
@@ -1548,7 +1548,7 @@ contains
             do i = 1,ii
               ij = i+nbdy+(idm+2*nbdy)*(j+nbdy-1)
               ijk = ij+(k-1)*ijdm
-              if (msk(ij) == 1.and.fld(ijk) /= fillr8) then
+              if (msk(ij) == 1 .and. (.not.realeq(fld(ijk),fillr8))) then
                 rfld(i,j,1) = nint(((fld(ijk)*sfac)+offs-ofs)/scf)-i2fill
               else
                 rfld(i,j,1) = 0
