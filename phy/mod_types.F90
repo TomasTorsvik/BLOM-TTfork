@@ -42,6 +42,15 @@ module mod_types
    integer,parameter :: BLOM_CHAR_X = 512     ! extra-long char
    integer,parameter :: BLOM_CHAR_XX= 4096    ! extra-extra-long char
 
+   ! logical function realeq
+   !
+   ! Determine if two real values (x, y) are equal within a tolerance tol
+   !
+   !   realeq == .true. if abs(x,y) < tol
+   !
+   !   x,y real, kind(r4,r8)
+   !   tol real, kind(r4,r8) -- optional
+   !
    ! Define generic interface for realeq
    interface realeq
      module procedure realeq_single, realeq_double
