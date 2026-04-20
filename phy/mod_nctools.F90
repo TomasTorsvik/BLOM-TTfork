@@ -97,7 +97,7 @@ module mod_nctools
   use mod_calendar, only: date_type, daynum_diff, calendar_noerr, &
                           calendar_errstr
   use netcdf
-  use mod_types,    only: i2, i4, r4
+  use mod_types,    only: i2, i4, r4, r8
 
   implicit none
   public
@@ -913,7 +913,7 @@ contains
         do k = 1,kd
           if (mnproc == 1) then
             istart(2) = k
-            icount(1) = nint(dble(ndm)/dble(kd))
+            icount(1) = nint(real(ndm, r8)/real(kd, r8))
           else
             icount(1) = 0
             icount(2) = 0
@@ -1107,7 +1107,7 @@ contains
         if (mnproc == 1) then
           if (cmpflg) then
             start(2) = k
-            count(1) = nint(dble(ndm)/dble(kd))
+            count(1) = nint(real(ndm, r8)/real(kd, r8))
           else
             start(3) = k
             count(1) = itdm
@@ -1325,14 +1325,14 @@ contains
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
+          scf = max(abs(fldmax),abs(fldmin))/real(i2max, r8)
         end if
         ofs = 0.d0
       else
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = (fldmax-fldmin)/dble(2*i2max)
+          scf = (fldmax-fldmin)/real(2*i2max, r8)
         end if
         ofs = 0.5*(fldmin+fldmax)
       end if
@@ -1500,14 +1500,14 @@ contains
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
+          scf = max(abs(fldmax),abs(fldmin))/real(i2max, r8)
         end if
         ofs = 0.d0
       else
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = (fldmax-fldmin)/dble(2*i2max)
+          scf = (fldmax-fldmin)/real(2*i2max, r8)
         end if
         ofs = 0.5*(fldmin+fldmax)
       end if
@@ -1872,14 +1872,14 @@ contains
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
+          scf = max(abs(fldmax),abs(fldmin))/real(i2max, r8)
         end if
         ofs = 0.d0
       else
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = (fldmax-fldmin)/dble(2*i2max)
+          scf = (fldmax-fldmin)/real(2*i2max, r8)
         end if
         ofs = 0.5*(fldmin+fldmax)
       end if
@@ -2002,14 +2002,14 @@ contains
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = max(abs(fldmax),abs(fldmin))/dble(i2max)
+          scf = max(abs(fldmax),abs(fldmin))/real(i2max, r8)
         end if
         ofs = 0.d0
       else
         if (fldmin >= fldmax) then
           scf = 1.d0
         else
-          scf = (fldmax-fldmin)/dble(2*i2max)
+          scf = (fldmax-fldmin)/real(2*i2max, r8)
         end if
         ofs = 0.5*(fldmin+fldmax)
       end if
