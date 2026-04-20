@@ -69,7 +69,7 @@ module mod_types
        ! accumulated arithmetic errors
        rtol = 10.0_r4 * epsilon(1.0_r4)
      end if
-     realeq = abs(x-y) < rtol
+     realeq_single = abs(x-y) < rtol
    end function realeq_single
 
    ! Compare double precision real (kind=r8)
@@ -84,7 +84,7 @@ module mod_types
        ! accumulated arithmetic errors
        rtol = 10.0_r8 * epsilon(1.0_r8)
      end if
-     realeq = abs(x-y) < rtol
+     realeq_double = abs(x-y) < rtol
    end function realeq_double
    
 end module mod_types
