@@ -1214,13 +1214,13 @@ contains
     character(len=4) :: c4
     integer :: i,j,ij,ijk,k,n,kd
     integer, parameter :: maxdm=5, ijdm = (idm+2*nbdy)*(jdm+2*nbdy)
-    real :: scf,ofs,arng(2),fldmin,fldmax
+    real(r8) :: scf,ofs,arng(2),fldmin,fldmax
     logical :: uvflg
     integer, dimension(maxdm) :: start,count
     integer(i2), allocatable, dimension(:,:,:) :: i2fld,fldout,fld_out
-    real, allocatable, dimension(:,:,:) :: rfld
+    real(r8), allocatable, dimension(:,:,:) :: rfld
     integer :: dimid,dimids(maxdm),strn,strind(2,maxdm)
-    real, dimension(itdm,jtdm) :: rfldt
+    real(r8), dimension(itdm,jtdm) :: rfldt
 
     ! --- Initialise fields
     uvflg = .false.
