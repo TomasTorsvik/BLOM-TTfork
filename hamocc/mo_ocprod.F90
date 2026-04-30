@@ -606,10 +606,45 @@ contains
               ocetra(i,j,k,ibromo) = ocetra(i,j,k,ibromo)+bro_beta*phosy-bro_uv
             endif
 
+            if (use_AGG) then
+              !***********************************************************************
+              ! effects of biological processes on number of particles:
+              ! photosynthesis creates POM
+              ! exudation deletes POM
+              ! grazing deletes POM; but only the fraction that is not egested as
+              ! fecal pellets again (grawa remains in zoo, graton goes to po4)
+              ! none of the processes at the current time is assumed to change
+              ! the size distribution (subject to change)
+              ! NOTE that phosy, exud etc. are in kmol/m3!
+              ! Thus divide by avmass (kmol/m3)
+              !**********************************************************************
+              if(avmass > 0._rp) then
+                avnos = ocetra(i,j,k,inos)
+                if (use_DOMclasses) then
+                  anosloss = (phosy-exud-exudsl-graton-grawa)*avnos/avmass
+                else
+                  anosloss = (phosy-exud-graton-grawa)*avnos/avmass
+                endif
+                ocetra(i,j,k,inos) = ocetra(i,j,k,inos)+anosloss
+              endif
+
+              !***********************************************************************
+              ! dead zooplankton corpses come with their own, flat distribution
+              ! this flow even takes place if there is neither nos nor mass
+              ! NOTE: zoomor is in kmol/m3!! Thus multiply flow by 1.e+6
+              !***********************************************************************
+              zmornos = zoomor * (1._rp-ecan) * zdis * 1.e+6_rp
+              ocetra(i,j,k,inos) = ocetra(i,j,k,inos)+zmornos
+            endif
+
 
             !***********************************************************************************************
             !  Remineralization and dissolution processes
             !***********************************************************************************************
+
+            if (use_AGG) then
+              avmass = ocetra(i,j,k,iphy)+ocetra(i,j,k,idet)
+            endif
 
             if (use_cisonew) then
               rdet13 = ocetra(i,j,k,idet13)/(ocetra(i,j,k,idet)+safediv)
@@ -801,37 +836,14 @@ contains
             ocetra(i,j,k,idms) = ocetra(i,j,k,idms)-dms_bac
 
             if (use_AGG) then
-
               !***********************************************************************
-              ! effects of biological processes on number of particles:
-              ! photosynthesis creates POM
-              ! exudation deletes POM
-              ! grazing deletes POM; but only the fraction that is not egested as
-              ! fecal pellets again (grawa remains in zoo, graton goes to po4)
-              ! none of the processes at the current time is assumed to change
-              ! the size distribution (subject to change)
-              ! NOTE that phosy, exud etc. are in kmol/m3!
-              ! Thus divide by avmass (kmol/m3)
-              !**********************************************************************
-
+              ! loss of snow numbers due to remineralization of poc
+              ! NOTE that pocrem is in kmol/m3. Thus divide by avmass (kmol/m3)
+              !***********************************************************************
               if(avmass > 0._rp) then
                 avnos = ocetra(i,j,k,inos)
-                if (use_DOMclasses) then
-                  anosloss = (phosy-exud-exudsl-graton-grawa)*avnos/avmass
-                else
-                  anosloss = (phosy-exud-graton-grawa)*avnos/avmass
-                endif
-                ocetra(i,j,k,inos) = ocetra(i,j,k,inos)+anosloss
+                ocetra(i,j,k,inos) = ocetra(i,j,k,inos)-pocrem*avnos/avmass
               endif
-
-              !***********************************************************************
-              ! dead zooplankton corpses come with their own, flat distribution
-              ! this flow even takes place if there is neither nos nor mass
-              ! NOTE: zoomor is in kmol/m3!! Thus multiply flow by 1.e+6
-              !***********************************************************************
-
-              zmornos = zoomor * (1._rp-ecan) * zdis * 1.e+6_rp
-              ocetra(i,j,k,inos) = ocetra(i,j,k,inos)+zmornos
             endif
 
 
