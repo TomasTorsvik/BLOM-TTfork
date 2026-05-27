@@ -34,7 +34,8 @@ c
      .                    scux, scuy, scvx, scvy, scq2, scp2, scu2,
      .                    scv2, qlon, qlat, plon, plat, ulon, ulat,
      .                    vlon, vlat, depths, corioq, coriop, betafp,
-     .                    betatp, angle, cosang, sinang, hangle, nwp
+     .                    betatp, angle, cosang, sinang, hangle, nwp,
+     .                    fwf_mask
       use netcdf
 c
       implicit none
@@ -698,6 +699,54 @@ c
         status=nf90_close(ncid)
         if (status.ne.nf90_noerr) then
           write(lp,'(4a)') ' nf90_close: ',trim(grfile),': ',
+     .                     nf90_strerror(status)
+          call xchalt('(geoenv_file)')
+                 stop '(geoenv_file)'
+        endif
+      endif
+c
+c --- ------------------------------------------------------------------
+c --- read in fwf mask file   --  tomast (from mmu072)  --   2026-04-28
+c --- ------------------------------------------------------------------
+c
+      if (mnproc.eq.1) then
+        write (lp,'(2a)') ' reading fwf mask information from ',
+     .                    'mask_fwf_greenland.nc'
+        call flush(lp)
+c
+c --- - open netcdf file
+        status=nf90_open('mask_fwf_greenland.nc',
+     .                   nf90_nowrite,ncid)
+        if (status.ne.nf90_noerr) then
+          write(lp,'(2a)') ' nf90_open: mask_fwf_greenland.nc: ',
+     .                     nf90_strerror(status)
+          call xchalt('(geoenv_file)')
+                 stop '(geoenv_file)'
+        endif
+c
+c --- - read fwf mask
+        status=nf90_inq_varid(ncid,'fwf_mask',varid)
+        if (status.ne.nf90_noerr) then
+          write(lp,'(2a)') ' nf90_inq_varid: fwf_mask: ',
+     .                     nf90_strerror(status)
+          call xchalt('(geoenv_file)')
+                 stop '(geoenv_file)'
+        endif
+        status=nf90_get_var(ncid,varid,tmpg)
+        if (status.ne.nf90_noerr) then
+           write(lp,'(2a)') ' nf90_get_var_double: fwf_mask: ',
+     .                      nf90_strerror(status)
+          call xchalt('(geoenv_file)')
+                 stop '(geoenv_file)'
+        endif
+      endif
+      call xcaput(tmpg,fwf_mask,1)
+c
+c --- close fwf mask information file
+      if (mnproc.eq.1) then
+        status=nf90_close(ncid)
+        if (status.ne.nf90_noerr) then
+          write(lp,'(2a)') ' nf90_close: mask_fwf_greenland.nc: ',
      .                     nf90_strerror(status)
           call xchalt('(geoenv_file)')
                  stop '(geoenv_file)'

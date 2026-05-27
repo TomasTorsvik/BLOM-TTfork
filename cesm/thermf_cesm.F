@@ -28,7 +28,7 @@ c
      .                    xmi, l1mi, l2mi, l3mi, l4mi, l5mi
       use mod_xc
       use mod_vcoord, only: vcoord_type_tag, isopyc_bulkml
-      use mod_grid, only: scp2, area
+      use mod_grid, only: scp2, area, fwf_mask
       use mod_state, only: dp, temp, saln, p
       use mod_swtfrz, only: swtfrz
       use mod_forcing, only: sref, tflxap, sflxap, tflxdi, sflxdi,
@@ -125,7 +125,9 @@ c --- --- Fresh water and salt fluxes
 c --- ------------------------------------------------------------------
 c
 c --- --- Fresh water flux [kg m-2 s-1] (positive downwards)
-          fwflx=eva(i,j)+lip(i,j)+sop(i,j)+rnf(i,j)+rfi(i,j)+fmltfz(i,j)
+C --- --- 2026-04-28 : Include fwf_mask for hosing experiments
+          fwflx=eva(i,j)+lip(i,j)+sop(i,j)+rnf(i,j)+rfi(i,j)
+     .         +fmltfz(i,j)+fwf_mask(i,j)
 c
 c --- --- Salt flux due to brine rejection of freezing sea
 c --- --- ice [kg m-2 m-1] (positive downwards)
