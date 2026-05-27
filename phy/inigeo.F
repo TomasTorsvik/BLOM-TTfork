@@ -35,7 +35,7 @@ c
      .                    scq2i, scp2i, scq2i, scuxi, scuyi, scvxi,
      .                    scvyi, qlon, qlat, plon, plat, ulon, ulat,
      .                    vlon, vlat, depths, corioq, coriop, betafp,
-     .                    area, nwp, inivar_grid
+     .                    area, nwp, inivar_grid, fwf_mask
       use mod_utility, only: util1, util2
       use mod_nctools
       use mod_dia, only : iotype
@@ -110,6 +110,7 @@ c --- ------------------------------------------------------------------
 c --- Update halos for parameters related to the geographic environment
 c --- ------------------------------------------------------------------
 c
+      call xctilr(fwf_mask, 1,1, nbdy,nbdy, halo_qs)
       call xctilr(qlat, 1,1, nbdy,nbdy, halo_qs)
       call xctilr(qlon, 1,1, nbdy,nbdy, halo_qs)
       call xctilr(plat, 1,1, nbdy,nbdy, halo_ps)
@@ -336,6 +337,7 @@ c
         if (mnproc.eq.1) then
           write (lp,*) 'inigeo:'
         endif
+        call chksummsk(fwf_mask,ip,1,'depths')
         call chksummsk(depths,ip,1,'depths')
         call chksummsk(plat,ip,1,'plat')
         call chksummsk(plon,ip,1,'plon')
