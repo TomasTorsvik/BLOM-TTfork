@@ -710,15 +710,22 @@ c --- read in fwf mask file   --  tomast (from mmu072)  --   2026-04-28
 c --- ------------------------------------------------------------------
 c
       if (mnproc.eq.1) then
+c        write (lp,'(2a)') ' reading fwf mask information from ',
+c     .                    'mask_fwf_greenland.nc'
         write (lp,'(2a)') ' reading fwf mask information from ',
-     .                    'mask_fwf_greenland.nc'
+     .                    'GRL_hosing_mask.nc'
         call flush(lp)
 c
 c --- - open netcdf file
-        status=nf90_open('mask_fwf_greenland.nc',
+c        status=nf90_open('mask_fwf_greenland.nc',
+c     .                   nf90_nowrite,ncid)
+c        if (status.ne.nf90_noerr) then
+c          write(lp,'(2a)') ' nf90_open: mask_fwf_greenland.nc: ',
+c     .                     nf90_strerror(status)
+        status=nf90_open('GRL_hosing_mask.nc',
      .                   nf90_nowrite,ncid)
         if (status.ne.nf90_noerr) then
-          write(lp,'(2a)') ' nf90_open: mask_fwf_greenland.nc: ',
+          write(lp,'(2a)') ' nf90_open: GRL_hosing_mask.nc: ',
      .                     nf90_strerror(status)
           call xchalt('(geoenv_file)')
                  stop '(geoenv_file)'
