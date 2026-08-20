@@ -25,7 +25,8 @@ c
      .                         g2kg, kg2g, L_mks2cgs, M_mks2cgs
       use mod_time, only: nstep, nstep_in_day, nday_in_year,
      .                    nday_of_year, baclin,
-     .                    xmi, l1mi, l2mi, l3mi, l4mi, l5mi
+     .                    xmi, l1mi, l2mi, l3mi, l4mi, l5mi,
+     .                    time0, time
       use mod_xc
       use mod_vcoord, only: vcoord_type_tag, isopyc_bulkml
       use mod_grid, only: scp2, area, fwf_mask
@@ -65,6 +66,10 @@ c
       real y,dpotl,hotl,totl,sotl,tice_f,fwflx,sstc,rice,dpmxl,hmxl,
      .     tmxl,trxflx,pbot,dprsi,sssc,smxl,srxflx,totsfl,totwfl,sflxc,
      .     totsrp,totsrn,qp,qn,A_cgs2mks
+c --- datenum  : elapsed time since strat of simulation
+c --- ramptime : duration (in decimal days) for ramp up/down
+c --- hosefrct : fraction of total hosing volume flux
+      real datenum,ramptime,hosefrct
 #ifdef TRC
       integer nt
       real, dimension(ntr,1-nbdy:idm+nbdy,1-nbdy:jdm+nbdy) ::
@@ -97,6 +102,13 @@ c --- Compute freezing temperatures of sea water
 c
       if (ditflx.or.disflx) nflxdi(ntld)=nflxdi(ntld)+1
 c
+c --- Time in days for ramp-up of salt-water fluxes
+c --- Calendar assumed "no_leap", i.e. 365 day without leap years
+c --- Assume 100 year ramp-up time
+      ramptime = 365. * 100.
+      datenum  = time - time0
+      hosefrct = datenum / ramptime
+c
 c$OMP PARALLEL DO PRIVATE(
 c$OMP+ l,i,dpotl,hotl,totl,sotl,tice_f,fwflx,sstc,rice,dpmxl,hmxl,tmxl,
 c$OMP+ trxflx,pbot,dprsi,kn,kl,sssc,smxl,srxflx
@@ -125,9 +137,9 @@ c --- --- Fresh water and salt fluxes
 c --- ------------------------------------------------------------------
 c
 c --- --- Fresh water flux [kg m-2 s-1] (positive downwards)
-C --- --- 2026-04-28 : Include fwf_mask for hosing experiments
+c --- --- 2026-04-28 : Include fwf_mask for hosing experiments
           fwflx=eva(i,j)+lip(i,j)+sop(i,j)+rnf(i,j)+rfi(i,j)
-     .         +fmltfz(i,j)+fwf_mask(i,j)
+     .         +fmltfz(i,j) + hosefrct*fwf_mask(i,j)
 c
 c --- --- Salt flux due to brine rejection of freezing sea
 c --- --- ice [kg m-2 m-1] (positive downwards)
