@@ -1824,6 +1824,7 @@
     <group>diffusion</group>
     <values>
       <value>1.</value>
+      <value atm_grid="ne30np4.pg3">.85</value>
     </values>
     <desc>Factor applied to 10 m absolute wind entering parameterization of Langmuir turbulence enhancement factor</desc>
   </entry>
@@ -4533,7 +4534,7 @@
     <desc>Source of dust/iron deposition data ('mahw2006' or 'GESAMP2018')</desc>
   </entry>
 
-  <entry id="fedepfile">
+  <entry id="fedepfile" is_inputdata="yes">
     <type>char</type>
     <category>bgcnml</category>
     <group>bgcnml</group>
@@ -11062,7 +11063,7 @@
   <!-- namelist group: nuopc_woa -->
   <!-- ========================= -->
 
-  <entry id="woa_mesh">
+  <entry id="woa_mesh" is_inputdata="yes">
     <type>char</type>
     <category>nuopc_woa</category>
     <group>nuopc_woa</group>
@@ -11072,7 +11073,7 @@
     </values>
   </entry>
 
-  <entry id="woa_filename_t">
+  <entry id="woa_filename_t" is_inputdata="yes">
     <type>char</type>
     <category>nuopc_woa</category>
     <group>nuopc_woa</group>
@@ -11082,7 +11083,7 @@
     </values>
   </entry>
 
-  <entry id="woa_filename_s">
+  <entry id="woa_filename_s" is_inputdata="yes">
     <type>char</type>
     <category>nuopc_woa</category>
     <group>nuopc_woa</group>
@@ -11116,7 +11117,7 @@
   <!-- namelist group: stream_sss -->
   <!-- =========================  -->
 
-  <entry id="stream_sss_mesh_filename">
+  <entry id="stream_sss_mesh_filename" is_inputdata="yes">
     <type>char</type>
     <category>stream_sss</category>
     <group>stream_sss</group>
@@ -11126,7 +11127,7 @@
       <value>$DIN_LOC_ROOT/share/meshes/tnx0.25v4_ESMFmesh_cdf5_c20231006.nc</value>
     </values>
   </entry>
-  <entry id="stream_sss_data_filename">
+  <entry id="stream_sss_data_filename" is_inputdata="yes">
     <type>char(10)</type>
     <category>stream_sss</category>
     <group>stream_sss</group>
@@ -11187,7 +11188,7 @@
   <!-- namelist group: stream_sst -->
   <!-- =========================  -->
 
-  <entry id="stream_sst_mesh_filename">
+  <entry id="stream_sst_mesh_filename" is_inputdata="yes">
     <type>char</type>
     <category>stream_sst</category>
     <group>stream_sst</group>
@@ -11196,7 +11197,7 @@
       <value>$DIN_LOC_ROOT/atm/cam/sst/sst_HadOIBl_bc_1x1_clim_c101029_ESMFmesh_120520.nc</value>
     </values>
   </entry>
-  <entry id="stream_sst_data_filename">
+  <entry id="stream_sst_data_filename" is_inputdata="yes">
     <type>char(10)</type>
     <category>stream_sst</category>
     <group>stream_sst</group>
@@ -11256,7 +11257,7 @@
   <!-- namelist group: stream_dust -->
   <!-- =========================  -->
 
-  <entry id="stream_dust_mesh_filename">
+  <entry id="stream_dust_mesh_filename" is_inputdata="yes">
     <type>char</type>
     <category>stream_dust</category>
     <group>stream_dust</group>
@@ -11266,7 +11267,7 @@
       <value hamocc_fedep_source="GESAMP2018">$DIN_LOC_ROOT/ocn/woa/WOA_1.00_degree_ESMFmesh_20250506_cdf5.nc</value>
     </values>
   </entry>
-  <entry id="stream_dust_data_filename">
+  <entry id="stream_dust_data_filename" is_inputdata="yes">
     <type>char(10)</type>
     <category>stream_dust</category>
     <group>stream_dust</group>

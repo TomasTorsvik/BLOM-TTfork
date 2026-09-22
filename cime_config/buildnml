@@ -69,6 +69,7 @@ def buildnml(case, caseroot, compname):
     run_refdate               = case.get_value("RUN_REFDATE")
     run_reftod                = case.get_value("RUN_REFTOD")
     ocn_grid                  = case.get_value("OCN_GRID")
+    atm_grid                  = case.get_value("ATM_GRID")
     ocn_ncpl                  = case.get_value("OCN_NCPL")
     pio_typename_ocn          = case.get_value("PIO_TYPENAME_OCN")
     pio_netcdf_format_ocn     = case.get_value("PIO_NETCDF_FORMAT_OCN")
@@ -225,6 +226,7 @@ def buildnml(case, caseroot, compname):
         # create config dictionary - used in namelist_definition_blom.xml
         config = {}
         config['ocn_grid'] = ocn_grid
+        config['atm_grid'] = atm_grid
         config['ocn_ncpl'] = str(ocn_ncpl)
         config['pio_typename_ocn'] = pio_typename_ocn
         config['pio_netcdf_format_ocn'] = pio_netcdf_format_ocn
