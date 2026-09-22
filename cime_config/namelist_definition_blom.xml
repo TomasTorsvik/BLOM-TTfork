@@ -1824,6 +1824,7 @@
     <group>diffusion</group>
     <values>
       <value>1.</value>
+      <value atm_grid="ne30np4.pg3">.85</value>
     </values>
     <desc>Factor applied to 10 m absolute wind entering parameterization of Langmuir turbulence enhancement factor</desc>
   </entry>
