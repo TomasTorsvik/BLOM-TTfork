@@ -108,6 +108,9 @@ c --- Assume 100 year ramp-up time
       ramptime = 365. * 100.
       datenum  = time - time0
       hosefrct = datenum / ramptime
+      if (mnproc.eq.1) then
+        write (lp,*) 'thermf: datenum,hosefrct',datenum,hosefrct
+      endif
 c
 c$OMP PARALLEL DO PRIVATE(
 c$OMP+ l,i,dpotl,hotl,totl,sotl,tice_f,fwflx,sstc,rice,dpmxl,hmxl,tmxl,
