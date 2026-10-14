@@ -46,12 +46,14 @@ c
       character (len = 256) :: nlfnm
       character (len=80), dimension(cwmlen) :: cwmtag
       character (len=1), dimension(cwmlen) :: cwmedg
-      real, dimension(itdm,jtdm) :: tmpg
+      real, dimension(itdm,jtdm) :: tmpg,parea
       real, dimension(cwmlen) :: cwmwth
       integer, dimension(cwmlen) :: cwmi,cwmj
       integer, dimension(3) :: start,count
       integer i,j,k,status,ncid,dimid,varid,ios,ncwm,l
       logical fexist
+c
+      real :: fwftot
 c
       real, parameter ::
      .  iL_mks2cgs = 1./L_mks2cgs
@@ -635,6 +637,9 @@ c
                  stop '(geoenv_file)'
         endif
       endif
+c --- save global grid area to "parea"
+      parea = tmpg
+c
       call xcaput(tmpg,scp2,1)
 c
       if (mnproc.eq.1) then
@@ -748,6 +753,15 @@ c --- - read fwf mask
           call xchalt('(geoenv_file)')
                  stop '(geoenv_file)'
         endif
+c
+c --- calculate and report total fwf
+        fwftot = 0.
+        do j=1,jtdm
+          do i=1,itdm
+            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)*parea(i,j)
+          enddo
+        enddo
+        write(lp,'(2a)') 'Sum fwf_mask*parea: ', fwftot, ' m**3/s'
       endif
       call xcaput(tmpg,fwf_mask,1)
 c
