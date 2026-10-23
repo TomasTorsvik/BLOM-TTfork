@@ -758,7 +758,8 @@ c --- calculate and report total fwf
         fwftot = 0.
         do j=1,jtdm
           do i=1,itdm
-            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)*parea(i,j)
+c            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)*parea(i,j)
+            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)
           enddo
         enddo
         write(lp,'(2a)') 'Sum fwf_mask*parea: ', fwftot, ' m**3/s'
