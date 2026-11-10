@@ -762,7 +762,8 @@ c            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)*parea(i,j)
             if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)
           enddo
         enddo
-        write(lp,'(2a)') 'Sum fwf_mask*parea: ', fwftot, ' m**3/s'
+c        write(lp,'(2a)') 'Sum fwf_mask*parea: ', fwftot, ' m**3/s'
+        write(lp,'(2a)') 'Sum fwf_mask: ', fwftot, ' m**3/s'
       endif
       call xcaput(tmpg,fwf_mask,1)
 c
