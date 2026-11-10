@@ -44,6 +44,7 @@ c
       parameter (cwmlen=100)
 c
       character (len = 256) :: nlfnm
+      character (len = 256) :: fwf_file
       character (len=80), dimension(cwmlen) :: cwmtag
       character (len=1), dimension(cwmlen) :: cwmedg
       real, dimension(itdm,jtdm) :: tmpg,parea
@@ -59,6 +60,7 @@ c
      .  iL_mks2cgs = 1./L_mks2cgs
 c
       namelist /cwmod/ cwmtag,cwmedg,cwmi,cwmj,cwmwth
+      namelist /hosing/ fwf_file
 c
 c --- ------------------------------------------------------------------
 c --- read grid information from grid file
@@ -713,71 +715,76 @@ c
 c --- ------------------------------------------------------------------
 c --- read in fwf mask file   --  tomast (from mmu072)  --   2026-04-28
 c --- ------------------------------------------------------------------
+c --- The file name is given by fwf_file in namelist hosing.
 c
       if (mnproc.eq.1) then
-c        write (lp,'(2a)') ' reading fwf mask information from ',
-c     .                    'mask_fwf_greenland.nc'
-        write(lp,'(2a)') ' reading fwf mask information from ',
-     .                    'GRL_hosing_mask.nc'
-        call flush(lp)
+        fwf_file='unset'
+        nlfnm='ocn_in'//trim(inst_suffix)
+        inquire(file=nlfnm,exist=fexist)
+        if (.not.fexist) then
+          nlfnm='limits'//trim(inst_suffix)
+          inquire(file=nlfnm,exist=fexist)
+        endif
+        if (fexist) then
+          open (unit=nfu,file=nlfnm,status='old',action='read')
+          read (unit=nfu,nml=hosing,iostat=ios)
+          close (unit=nfu)
+        endif
+        fwf_file=adjustl(fwf_file)
+        tmpg=0.
+        if (trim(fwf_file).eq.'unset'.or.trim(fwf_file).eq.'') then
+          write(lp,'(2a)') ' fwf_file not set in namelist hosing;',
+     .                     ' using zero fwf mask'
+        else
+          write(lp,'(2a)') ' reading fwf mask information from ',
+     .                     trim(fwf_file)
+          call flush(lp)
 c
 c --- - open netcdf file
-c        status=nf90_open('mask_fwf_greenland.nc',
-c     .                   nf90_nowrite,ncid)
-c        if (status.ne.nf90_noerr) then
-c          write(lp,'(2a)') ' nf90_open: mask_fwf_greenland.nc: ',
-c     .                     nf90_strerror(status)
-        write(lp,'(2a)') ' open fwf mask file'
-        status=nf90_open('GRL_hosing_mask.nc',
-     .                   nf90_nowrite,ncid)
-        if (status.ne.nf90_noerr) then
-          write(lp,'(2a)') ' nf90_open: GRL_hosing_mask.nc: ',
-     .                     nf90_strerror(status)
-          call xchalt('(geoenv_file)')
-                 stop '(geoenv_file)'
-        endif
+          status=nf90_open(trim(fwf_file),nf90_nowrite,ncid)
+          if (status.ne.nf90_noerr) then
+            write(lp,'(4a)') ' nf90_open: ',trim(fwf_file),': ',
+     .                       nf90_strerror(status)
+            call xchalt('(geoenv_file)')
+                   stop '(geoenv_file)'
+          endif
 c
 c --- - read fwf mask
-        write(lp,'(2a)') ' reading fwf mask information'
-        status=nf90_inq_varid(ncid,'fwf_mask',varid)
-        if (status.ne.nf90_noerr) then
-          write(lp,'(2a)') ' nf90_inq_varid: fwf_mask: ',
-     .                     nf90_strerror(status)
-          call xchalt('(geoenv_file)')
-                 stop '(geoenv_file)'
-        endif
-        status=nf90_get_var(ncid,varid,tmpg)
-        if (status.ne.nf90_noerr) then
-          write(lp,'(2a)') ' nf90_get_var_double: fwf_mask: ',
-     .                     nf90_strerror(status)
-          call xchalt('(geoenv_file)')
-                 stop '(geoenv_file)'
-        endif
+          status=nf90_inq_varid(ncid,'fwf_mask',varid)
+          if (status.ne.nf90_noerr) then
+            write(lp,'(2a)') ' nf90_inq_varid: fwf_mask: ',
+     .                       nf90_strerror(status)
+            call xchalt('(geoenv_file)')
+                   stop '(geoenv_file)'
+          endif
+          status=nf90_get_var(ncid,varid,tmpg)
+          if (status.ne.nf90_noerr) then
+            write(lp,'(2a)') ' nf90_get_var_double: fwf_mask: ',
+     .                       nf90_strerror(status)
+            call xchalt('(geoenv_file)')
+                   stop '(geoenv_file)'
+          endif
 c
-c --- calculate and report total fwf
-        fwftot = 0.
-        do j=1,jtdm
-          do i=1,itdm
-c            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)*parea(i,j)
-            if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)
+c --- - close fwf mask file
+          status=nf90_close(ncid)
+          if (status.ne.nf90_noerr) then
+            write(lp,'(4a)') ' nf90_close: ',trim(fwf_file),': ',
+     .                       nf90_strerror(status)
+            call xchalt('(geoenv_file)')
+                   stop '(geoenv_file)'
+          endif
+c
+c --- - calculate and report total fwf
+          fwftot = 0.
+          do j=1,jtdm
+            do i=1,itdm
+              if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)
+            enddo
           enddo
-        enddo
-c        write(lp,'(2a)') 'Sum fwf_mask*parea: ', fwftot, ' m**3/s'
-        write(lp,'(2a)') 'Sum fwf_mask: ', fwftot, ' m**3/s'
+          write(lp,'(a,e12.4,a)') ' Sum fwf_mask: ',fwftot,' m**3/s'
+        endif
       endif
       call xcaput(tmpg,fwf_mask,1)
-c
-c --- close fwf mask information file
-      if (mnproc.eq.1) then
-        write(lp,'(2a)') ' close fwf mask file'
-        status=nf90_close(ncid)
-        if (status.ne.nf90_noerr) then
-          write(lp,'(2a)') ' nf90_close: mask_fwf_greenland.nc: ',
-     .                     nf90_strerror(status)
-          call xchalt('(geoenv_file)')
-                 stop '(geoenv_file)'
-        endif
-      endif
 c
 c --- ------------------------------------------------------------------
 c --- read topographic beta if needed

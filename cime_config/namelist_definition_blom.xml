@@ -6659,4 +6659,15 @@
     <desc>SST mask file for pacemaker experiment</desc>
   </entry>
 
+  <!-- Entries for freshwater hosing experiments. -->
+  <entry id="fwf_file" is_inputdata="yes">
+    <type>char</type>
+    <category>hosing</category>
+    <group>hosing</group>
+    <values>
+      <value>unset</value>
+    </values>
+    <desc>File name (incl. full path) for freshwater input data</desc>
+  </entry>
+
 </entry_id_pg>
