@@ -6667,7 +6667,7 @@
     <values>
       <value>unset</value>
     </values>
-    <desc>File name (incl. full path) for freshwater input data</desc>
+    <desc>File name (incl. full path) for freshwater input data. The variable fwf_mask is the freshwater volume flux per grid cell [m3 s-1].</desc>
   </entry>
 
 </entry_id_pg>

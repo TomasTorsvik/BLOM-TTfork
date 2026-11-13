@@ -55,6 +55,7 @@ c
       logical fexist
 c
       real :: fwftot
+      real, parameter :: rho_fw = 1.e3  ! Fresh water density [kg m-3]
 c
       real, parameter ::
      .  iL_mks2cgs = 1./L_mks2cgs
@@ -782,6 +783,18 @@ c --- - calculate and report total fwf
             enddo
           enddo
           write(lp,'(a,e12.4,a)') ' Sum fwf_mask: ',fwftot,' m**3/s'
+c
+c --- - convert volume flux [m3 s-1] to freshwater flux per unit area
+c --- - [kg m-2 s-1], using parea [m2] and fresh water density
+          do j=1,jtdm
+            do i=1,itdm
+              if (parea(i,j).gt.0.) then
+                tmpg(i,j) = tmpg(i,j)*rho_fw/parea(i,j)
+              else
+                tmpg(i,j) = 0.
+              endif
+            enddo
+          enddo
         endif
       endif
       call xcaput(tmpg,fwf_mask,1)

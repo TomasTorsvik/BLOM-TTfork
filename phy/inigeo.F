@@ -337,7 +337,7 @@ c
         if (mnproc.eq.1) then
           write (lp,*) 'inigeo:'
         endif
-        call chksummsk(fwf_mask,ip,1,'depths')
+        call chksummsk(fwf_mask,ip,1,'fwf_mask')
         call chksummsk(depths,ip,1,'depths')
         call chksummsk(plat,ip,1,'plat')
         call chksummsk(plon,ip,1,'plon')
