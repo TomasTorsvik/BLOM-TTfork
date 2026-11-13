@@ -730,6 +730,16 @@ c
           open (unit=nfu,file=nlfnm,status='old',action='read')
           read (unit=nfu,nml=hosing,iostat=ios)
           close (unit=nfu)
+          if (ios.gt.0) then
+            write(lp,'(2a)') ' geoenv_file: error reading namelist',
+     .                       ' hosing!'
+            call xchalt('(geoenv_file)')
+                   stop '(geoenv_file)'
+          elseif (ios.lt.0) then
+            write(lp,'(2a)') ' geoenv_file: namelist hosing not',
+     .                       ' found; fwf_file unset'
+            fwf_file='unset'
+          endif
         endif
         fwf_file=adjustl(fwf_file)
         tmpg=0.
