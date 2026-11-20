@@ -71,7 +71,6 @@ module mod_grid
       ulat, &    ! Latitude of u-point [degrees].
       vlon, &    ! Longitude of v-point [degrees].
       vlat, &    ! Latitude of v-point [degrees].
-      fwf_mask, &  ! extra fwf flux for hosing experiments
       depths, &  ! Water depth [m].
       corioq, &  ! Coriolis parameter at q-point [s-1].
       coriop, &  ! Coriolis parameter at p-point [s-1].
@@ -101,7 +100,7 @@ module mod_grid
              qlon, qlat, plon, plat, ulon, ulat, vlon, vlat, &
              depths, corioq, coriop, betafp, betatp, &
              angle, cosang, sinang, hangle, &
-             area, fwf_mask, nwp, &
+             area, nwp, &
              inivar_grid
 
 contains
@@ -154,7 +153,6 @@ contains
             ulat(i, j) = spval
             vlon(i, j) = spval
             vlat(i, j) = spval
-            fwf_mask(i, j) = spval
             depths(i, j) = spval
             corioq(i, j) = spval
             coriop(i, j) = spval

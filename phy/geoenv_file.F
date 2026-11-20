@@ -34,8 +34,7 @@ c
      .                    scux, scuy, scvx, scvy, scq2, scp2, scu2,
      .                    scv2, qlon, qlat, plon, plat, ulon, ulat,
      .                    vlon, vlat, depths, corioq, coriop, betafp,
-     .                    betatp, angle, cosang, sinang, hangle, nwp,
-     .                    fwf_mask
+     .                    betatp, angle, cosang, sinang, hangle, nwp
       use netcdf
 c
       implicit none
@@ -44,24 +43,19 @@ c
       parameter (cwmlen=100)
 c
       character (len = 256) :: nlfnm
-      character (len = 256) :: fwf_file
       character (len=80), dimension(cwmlen) :: cwmtag
       character (len=1), dimension(cwmlen) :: cwmedg
-      real, dimension(itdm,jtdm) :: tmpg,parea
+      real, dimension(itdm,jtdm) :: tmpg
       real, dimension(cwmlen) :: cwmwth
       integer, dimension(cwmlen) :: cwmi,cwmj
       integer, dimension(3) :: start,count
       integer i,j,k,status,ncid,dimid,varid,ios,ncwm,l
       logical fexist
 c
-      real :: fwftot
-      real, parameter :: rho_fw = 1.e3  ! Fresh water density [kg m-3]
-c
       real, parameter ::
      .  iL_mks2cgs = 1./L_mks2cgs
 c
       namelist /cwmod/ cwmtag,cwmedg,cwmi,cwmj,cwmwth
-      namelist /hosing/ fwf_file
 c
 c --- ------------------------------------------------------------------
 c --- read grid information from grid file
@@ -640,9 +634,6 @@ c
                  stop '(geoenv_file)'
         endif
       endif
-c --- save global grid area to "parea"
-      parea = tmpg
-c
       call xcaput(tmpg,scp2,1)
 c
       if (mnproc.eq.1) then
@@ -712,102 +703,6 @@ c
                  stop '(geoenv_file)'
         endif
       endif
-c
-c --- ------------------------------------------------------------------
-c --- read in fwf mask file   --  tomast (from mmu072)  --   2026-04-28
-c --- ------------------------------------------------------------------
-c --- The file name is given by fwf_file in namelist hosing.
-c
-      if (mnproc.eq.1) then
-        fwf_file='unset'
-        nlfnm='ocn_in'//trim(inst_suffix)
-        inquire(file=nlfnm,exist=fexist)
-        if (.not.fexist) then
-          nlfnm='limits'//trim(inst_suffix)
-          inquire(file=nlfnm,exist=fexist)
-        endif
-        if (fexist) then
-          open (unit=nfu,file=nlfnm,status='old',action='read')
-          read (unit=nfu,nml=hosing,iostat=ios)
-          close (unit=nfu)
-          if (ios.gt.0) then
-            write(lp,'(2a)') ' geoenv_file: error reading namelist',
-     .                       ' hosing!'
-            call xchalt('(geoenv_file)')
-                   stop '(geoenv_file)'
-          elseif (ios.lt.0) then
-            write(lp,'(2a)') ' geoenv_file: namelist hosing not',
-     .                       ' found; fwf_file unset'
-            fwf_file='unset'
-          endif
-        endif
-        fwf_file=adjustl(fwf_file)
-        tmpg=0.
-        if (trim(fwf_file).eq.'unset'.or.trim(fwf_file).eq.'') then
-          write(lp,'(2a)') ' fwf_file not set in namelist hosing;',
-     .                     ' using zero fwf mask'
-        else
-          write(lp,'(2a)') ' reading fwf mask information from ',
-     .                     trim(fwf_file)
-          call flush(lp)
-c
-c --- - open netcdf file
-          status=nf90_open(trim(fwf_file),nf90_nowrite,ncid)
-          if (status.ne.nf90_noerr) then
-            write(lp,'(4a)') ' nf90_open: ',trim(fwf_file),': ',
-     .                       nf90_strerror(status)
-            call xchalt('(geoenv_file)')
-                   stop '(geoenv_file)'
-          endif
-c
-c --- - read fwf mask
-          status=nf90_inq_varid(ncid,'fwf_mask',varid)
-          if (status.ne.nf90_noerr) then
-            write(lp,'(2a)') ' nf90_inq_varid: fwf_mask: ',
-     .                       nf90_strerror(status)
-            call xchalt('(geoenv_file)')
-                   stop '(geoenv_file)'
-          endif
-          status=nf90_get_var(ncid,varid,tmpg)
-          if (status.ne.nf90_noerr) then
-            write(lp,'(2a)') ' nf90_get_var_double: fwf_mask: ',
-     .                       nf90_strerror(status)
-            call xchalt('(geoenv_file)')
-                   stop '(geoenv_file)'
-          endif
-c
-c --- - close fwf mask file
-          status=nf90_close(ncid)
-          if (status.ne.nf90_noerr) then
-            write(lp,'(4a)') ' nf90_close: ',trim(fwf_file),': ',
-     .                       nf90_strerror(status)
-            call xchalt('(geoenv_file)')
-                   stop '(geoenv_file)'
-          endif
-c
-c --- - calculate and report total fwf
-          fwftot = 0.
-          do j=1,jtdm
-            do i=1,itdm
-              if (tmpg(i,j).gt.0.) fwftot = fwftot + tmpg(i,j)
-            enddo
-          enddo
-          write(lp,'(a,e12.4,a)') ' Sum fwf_mask: ',fwftot,' m**3/s'
-c
-c --- - convert volume flux [m3 s-1] to freshwater flux per unit area
-c --- - [kg m-2 s-1], using parea [m2] and fresh water density
-          do j=1,jtdm
-            do i=1,itdm
-              if (parea(i,j).gt.0.) then
-                tmpg(i,j) = tmpg(i,j)*rho_fw/parea(i,j)
-              else
-                tmpg(i,j) = 0.
-              endif
-            enddo
-          enddo
-        endif
-      endif
-      call xcaput(tmpg,fwf_mask,1)
 c
 c --- ------------------------------------------------------------------
 c --- read topographic beta if needed

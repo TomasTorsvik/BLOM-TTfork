@@ -42,6 +42,7 @@ c
       use mod_inicon, only: inicon
       use mod_budget, only: budget_init
       use mod_cmnfld_routines, only: cmnfld1
+      use mod_hosing, only: init_hosing
       use netcdf
 #if defined(TRC) && defined(TKE)
       use mod_tke, only: initke
@@ -119,6 +120,12 @@ c --- Initialize forcing
 c --- ------------------------------------------------------------------
 c
       call inifrc
+c
+c --- ------------------------------------------------------------------
+c --- Initialize freshwater hosing
+c --- ------------------------------------------------------------------
+c
+      call init_hosing
 c
 c --- ------------------------------------------------------------------
 c --- Define coefficients for equation of state functions
