@@ -76,8 +76,12 @@ module mod_hosing
       ramp_start_date ! Start date of ramp.
 
    real(r8), dimension(1 - nbdy:idm + nbdy, 1 - nbdy:jdm + nbdy) :: &
-      fwf_mask        ! Freshwater flux for hosing experiments, before applying
+      fwf_mask, &     ! Freshwater flux for hosing experiments, before applying
                       ! the hosing fraction [kg m-2 s-1].
+      hosflx          ! Applied hosing freshwater flux [kg m-2 s-1].
+
+   logical :: &
+      nml_read = .false. ! True when namelist 'hosing' has been read.
 
    real(r8) :: &
       fwf_total       ! Global hosing volume flux with hosing fraction equal to
@@ -88,17 +92,19 @@ module mod_hosing
       fwf_tol = 1.e-3_r8  ! Relative tolerance for the difference between the
                           ! applied and the prescribed global hosing flux [].
 
-   public :: use_hosing, fwf_mask, init_hosing, hosing_fraction, log_hosing
+   public :: use_hosing, fwf_mask, hosflx, read_hosing_nml, init_hosing, &
+             hosing_fraction, log_hosing
 
 contains
 
-   subroutine init_hosing
+   subroutine read_hosing_nml
    ! ---------------------------------------------------------------------------
-   ! Read namelist 'hosing' and, if hosing is active, the freshwater flux file.
+   ! Read namelist 'hosing'. Called from 'rdlim' so that 'use_hosing' is known
+   ! when the diagnostic namelist is processed.
    ! ---------------------------------------------------------------------------
 
       character(len = 256) :: nlfnm
-      integer :: ios, errstat
+      integer :: ios
       logical :: fexist
 
       namelist /hosing/ use_hosing, fwf_file, fwf_scale, fwf_frac_start, fwf_frac_end, &
@@ -126,11 +132,12 @@ contains
             read (unit = nfu, nml = hosing, iostat = ios)
             close (unit = nfu)
             if (ios > 0) then
-               write (lp, '(a)') ' init_hosing: error reading namelist hosing!'
-               call xchalt('(init_hosing)')
-                      stop '(init_hosing)'
+               write (lp, '(a)') &
+                  ' read_hosing_nml: error reading namelist hosing!'
+               call xchalt('(read_hosing_nml)')
+                      stop '(read_hosing_nml)'
             elseif (ios < 0) then
-               write (lp, '(a)') ' init_hosing: namelist hosing not found.'
+               write (lp, '(a)') ' read_hosing_nml: namelist hosing not found.'
                use_hosing = .false.
             endif
          endif
@@ -145,7 +152,22 @@ contains
       call xcbcst(fwf_ramp_start)
       call xcbcst(fwf_ramp_ndays)
 
+      nml_read = .true.
+
+   end subroutine read_hosing_nml
+
+   subroutine init_hosing
+   ! ---------------------------------------------------------------------------
+   ! Check namelist 'hosing' and, if hosing is enabled, read the freshwater
+   ! flux file.
+   ! ---------------------------------------------------------------------------
+
+      integer :: errstat
+
+      if (.not. nml_read) call read_hosing_nml
+
       fwf_mask(:, :) = 0._r8
+      hosflx(:, :) = 0._r8
 
       if (.not. use_hosing) then
          if (mnproc == 1) then

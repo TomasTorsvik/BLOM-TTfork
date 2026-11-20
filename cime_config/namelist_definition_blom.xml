@@ -1486,6 +1486,18 @@
     <desc>heat flux due to melting/freezing [W m-2]</desc>
   </entry>
 
+  <entry id="h2d_hosflx">
+    <type>integer(3)</type>
+    <category>diaphy</category>
+    <group>diaphy</group>
+    <values>
+      <value>0,4,0</value>
+      <value is_test="yes">4,4,0</value>
+      <value is_test="yes" empty_hist="yes">0,0,0</value>
+    </values>
+    <desc>fresh water flux due to hosing [kg m-2 s-1]. Only written if use_hosing is .true.</desc>
+  </entry>
+
   <entry id="h2d_hsnw">
     <type>integer(3)</type>
     <category>diaphy</category>

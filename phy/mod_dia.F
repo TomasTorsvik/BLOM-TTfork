@@ -58,6 +58,7 @@ c
      .                       surrlx, salflx, brnflx, salrlx, taux, tauy,
      .                       ustar, ustar3
       use mod_niw, only: idkedt
+      use mod_hosing, only: hosflx
       use mod_utility, only: util1, util2, util3, util4
       use mod_ben02, only: dfl, alb
 #ifdef TRC
@@ -199,6 +200,7 @@ c --- Namelist
      . H2D_T20D   ,H2D_TAUX   ,H2D_TAUY   ,H2D_TBOT   ,H2D_TICE   ,
      . H2D_TSRF   ,H2D_UB     ,H2D_UICE   ,H2D_USTAR  ,H2D_USTAR3 ,
      . H2D_USTOKES,H2D_VB     ,H2D_VICE   ,H2D_VSTOKES,H2D_ZTX    ,
+     . H2D_HOSFLX ,
      . LYR_BFSQ   ,LYR_DIFDIA ,LYR_DIFVMO ,LYR_DIFVHO ,LYR_DIFVSO ,
      . LYR_DIFINT ,LYR_DIFISO ,LYR_DP     ,LYR_DPU    ,LYR_DPV    ,
      . LYR_DZ     ,LYR_SALN   ,LYR_TEMP   ,LYR_TRC    ,LYR_UFLX   ,
@@ -239,6 +241,7 @@ c --- Namelist
      . ACC_UB     ,ACC_UBFLXS ,ACC_UICE   ,ACC_USTAR  ,ACC_USTAR3 ,
      . ACC_USTOKES,ACC_VB     ,ACC_VBFLXS ,ACC_VICE   ,ACC_VSTOKES,
      . ACC_ZTX    ,ACC_IVOLU  ,ACC_IVOLV  ,ACC_UTILH2D,
+     . ACC_HOSFLX ,
      . ACC_BFSQ   ,ACC_DIFDIA ,ACC_DIFVMO ,ACC_DIFVHO ,ACC_DIFVSO ,
      . ACC_DIFINT ,ACC_DIFISO ,ACC_DP     ,ACC_DPU    ,ACC_DPV    ,
      . ACC_DZ     ,ACC_SALN   ,ACC_TEMP   ,ACC_UFLX   ,ACC_UTFLX  ,
@@ -280,6 +283,7 @@ c --- Namelist
      . H2D_T20D   ,H2D_TAUX   ,H2D_TAUY   ,H2D_TBOT   ,H2D_TICE   ,
      . H2D_TSRF   ,H2D_UB     ,H2D_UICE   ,H2D_USTAR  ,H2D_USTAR3 ,
      . H2D_USTOKES,H2D_VB     ,H2D_VICE   ,H2D_VSTOKES,H2D_ZTX    ,
+     . H2D_HOSFLX ,
      . LYR_BFSQ   ,LYR_DIFDIA ,LYR_DIFVMO ,LYR_DIFVHO ,LYR_DIFVSO ,
      . LYR_DIFINT ,LYR_DIFISO ,LYR_DP     ,LYR_DPU    ,LYR_DPV    ,
      . LYR_DZ     ,LYR_SALN   ,LYR_TEMP   ,LYR_TRC    ,LYR_UFLX   ,
@@ -461,6 +465,7 @@ c --- - Solve dependencies for diagnostic variables (0=skipped)
      .                  + H2D_VICE(n)   + H2D_HSNW(n)
         ACC_HICE(n)     = H2D_HICE(n)   + H2D_UICE(n)   + H2D_VICE(n)
         ACC_HMLTFZ(n)   = H2D_HMLTFZ(n)
+        ACC_HOSFLX(n)   = H2D_HOSFLX(n)
         ACC_HSNW(n)     = H2D_HSNW(n)
         ACC_IAGE(n)     = H2D_IAGE(n)
         ACC_IDKEDT(n)   = H2D_IDKEDT(n)
@@ -657,6 +662,8 @@ c --- - Determine position in buffer
          ACC_HICE(n)=nphyh2d*min(1,ACC_HICE(n))
         if (ACC_HMLTFZ(n).ne.0) nphyh2d=nphyh2d+1
          ACC_HMLTFZ(n)=nphyh2d*min(1,ACC_HMLTFZ(n))
+        if (ACC_HOSFLX(n).ne.0) nphyh2d=nphyh2d+1
+         ACC_HOSFLX(n)=nphyh2d*min(1,ACC_HOSFLX(n))
         if (ACC_HSNW(n).ne.0) nphyh2d=nphyh2d+1
          ACC_HSNW(n)=nphyh2d*min(1,ACC_HSNW(n))
         if (ACC_IAGE(n).ne.0) nphyh2d=nphyh2d+1
@@ -1386,6 +1393,9 @@ c --- evaporation [mm/day]
 c
 c --- fresh water flux due to melting/freezing [kg/m^2/s]
       call acch2d(ACC_FMLTFZ,fmltfz,dummy,0,'p')
+c
+c --- fresh water flux due to hosing [kg/m^2/s]
+      call acch2d(ACC_HOSFLX,hosflx,dummy,0,'p')
 c
 c --- salt flux [kg/m^2/s]
       call acch2d(ACC_SFL,sfl,dummy,0,'p')
@@ -2457,6 +2467,10 @@ c
       call wrth2d(ACC_FMLTFZ(iogrp),H2D_FMLTFZ(iogrp),
      .  rnacc,0.,cmpflg,ip,'p','fmltfz',
      .  'Fresh water flux due to melting/freezing',' ','kg m-2 s-1')
+c
+      call wrth2d(ACC_HOSFLX(iogrp),H2D_HOSFLX(iogrp),
+     .  rnacc,0.,cmpflg,ip,'p','hosflx',
+     .  'Fresh water flux due to hosing',' ','kg m-2 s-1')
 c
       call wrth2d(ACC_RNFFLX(iogrp),H2D_RNFFLX(iogrp),
      .  rnacc,0.,cmpflg,ip,'p','rnf','Liquid runoff',' ','kg m-2 s-1')
@@ -5459,6 +5473,7 @@ c
       call inih2d(ACC_LAMULT(iogrp),'p',0.)
       call inih2d(ACC_LASL(iogrp),'p',0.)
       call inih2d(ACC_FMLTFZ(iogrp),'p',0.)
+      call inih2d(ACC_HOSFLX(iogrp),'p',0.)
       call inih2d(ACC_HMLTFZ(iogrp),'p',0.)
       call inih2d(ACC_HICE(iogrp),'p',0.)
       call inih2d(ACC_HSNW(iogrp),'p',0.)
@@ -6427,6 +6442,9 @@ c
 c
       call ncdefvar3d(H2D_FMLTFZ(iogrp),cmpflg,'p','fmltfz',
      .  'Fresh water flux due to melting/freezing',' ','kg m-2 s-1',0)
+c
+      call ncdefvar3d(H2D_HOSFLX(iogrp),cmpflg,'p','hosflx',
+     .  'Fresh water flux due to hosing',' ','kg m-2 s-1',0)
 c
       call ncdefvar3d(H2D_RNFFLX(iogrp),cmpflg,'p','rnf',
      .  'Liquid runoff',' ','kg m-2 s-1',0)

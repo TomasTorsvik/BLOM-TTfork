@@ -29,8 +29,8 @@ c
       use mod_xc
       use mod_vcoord, only: vcoord_type_tag, isopyc_bulkml
       use mod_grid, only: scp2, area
-      use mod_hosing, only: use_hosing, fwf_mask, hosing_fraction,
-     .                      log_hosing
+      use mod_hosing, only: use_hosing, fwf_mask, hosflx,
+     .                      hosing_fraction, log_hosing
       use mod_state, only: dp, temp, saln, p
       use mod_swtfrz, only: swtfrz
       use mod_forcing, only: sref, tflxap, sflxap, tflxdi, sflxdi,
@@ -138,8 +138,9 @@ c --- ------------------------------------------------------------------
 c
 c --- --- Fresh water flux [kg m-2 s-1] (positive downwards)
 c --- --- including freshwater hosing
+          hosflx(i,j)=hosefrct*fwf_mask(i,j)
           fwflx=eva(i,j)+lip(i,j)+sop(i,j)+rnf(i,j)+rfi(i,j)+fmltfz(i,j)
-     .         +hosefrct*fwf_mask(i,j)
+     .         +hosflx(i,j)
 c
 c --- --- Salt flux due to brine rejection of freezing sea
 c --- --- ice [kg m-2 m-1] (positive downwards)

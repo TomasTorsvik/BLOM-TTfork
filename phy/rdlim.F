@@ -53,6 +53,7 @@ c
       use mod_mxlayr, only: rm0, rm5, ce, mlrttp
       use mod_niw, only: niwgf, niwbf, niwlf
       use mod_tidaldissip, only: tdfile
+      use mod_hosing, only: read_hosing_nml, use_hosing
       use mod_dia
       use mod_ben02, only: atm_path, atm_path_len
       use mod_vcoord, only: vcoord_type_tag, isopyc_bulkml,
@@ -279,6 +280,9 @@ c
 c --- read diffusion namelist variables
       call readnml_diffusion
 c
+c --- read hosing namelist variables
+      call read_hosing_nml
+c
 c --- read diaphy namelist
 c
       if (mnproc.eq.1) then
@@ -341,6 +345,9 @@ c --- - variables set in namelists
         if (srxday.eq.0.) then
           H2D_SALRLX(1:nphy)=0
         endif
+        if (.not.use_hosing) then
+          H2D_HOSFLX(1:nphy)=0
+        endif
         select case (wavsrc_opt)
           case (wavsrc_none)
             H2D_LAMULT(1:nphy)=0
@@ -375,6 +382,7 @@ c --- - print diaphy namelist
         write (lp,*) 'H2D_FICE    ',H2D_FICE(1:nphy)
         write (lp,*) 'H2D_HICE    ',H2D_HICE(1:nphy)
         write (lp,*) 'H2D_HMLTFZ  ',H2D_HMLTFZ(1:nphy)
+        write (lp,*) 'H2D_HOSFLX  ',H2D_HOSFLX(1:nphy)
         write (lp,*) 'H2D_HSNW    ',H2D_HSNW(1:nphy)
         write (lp,*) 'H2D_IAGE    ',H2D_IAGE(1:nphy)
         write (lp,*) 'H2D_IDKEDT  ',H2D_IDKEDT(1:nphy)
@@ -553,6 +561,7 @@ c
       call xcbcst(H2D_FMLTFZ)
       call xcbcst(H2D_HICE)
       call xcbcst(H2D_HMLTFZ)
+      call xcbcst(H2D_HOSFLX)
       call xcbcst(H2D_HSNW)
       call xcbcst(H2D_IAGE)
       call xcbcst(H2D_IDKEDT)
