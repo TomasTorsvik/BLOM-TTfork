@@ -52,6 +52,7 @@ module mod_hosing
    use mod_grid, only: scp2
    use mod_checksum, only: csdiag, chksummsk
    use netcdf
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
 
    implicit none
 
@@ -78,10 +79,16 @@ module mod_hosing
       fwf_mask        ! Freshwater flux for hosing experiments, before applying
                       ! the hosing fraction [kg m-2 s-1].
 
-   real(r8), parameter :: &
-      rho_fw = 1.e3_r8 ! Fresh water density [kg m-3].
+   real(r8) :: &
+      fwf_total       ! Global hosing volume flux with hosing fraction equal to
+                      ! one, including 'fwf_scale' [m3 s-1].
 
-   public :: use_hosing, fwf_mask, init_hosing, hosing_fraction
+   real(r8), parameter :: &
+      rho_fw = 1.e3_r8, & ! Fresh water density [kg m-3].
+      fwf_tol = 1.e-3_r8  ! Relative tolerance for the difference between the
+                          ! applied and the prescribed global hosing flux [].
+
+   public :: use_hosing, fwf_mask, init_hosing, hosing_fraction, log_hosing
 
 contains
 
@@ -203,6 +210,7 @@ contains
    ! ---------------------------------------------------------------------------
 
       real(r8), dimension(itdm, jtdm) :: tmpg
+      real(r8), dimension(1 - nbdy:idm + nbdy, 1 - nbdy:jdm + nbdy) :: vflx
       real(r8) :: fwftot
       integer :: i, j, errstat, ncid, varid
 
@@ -244,11 +252,13 @@ contains
                    stop '(read_hosing_file)'
          endif
 
-         ! Report total freshwater volume flux.
-         fwftot = sum(tmpg, mask = tmpg > 0._r8)
-         write (lp, '(a,es12.4,a)') ' Sum fwf_mask: ', fwftot, ' m3 s-1'
-         write (lp, '(a,es12.4,a)') ' Maximum hosing: ', &
-                                    fwf_scale*fwftot*1.e-6_r8, ' Sv'
+         ! Set non-finite values (e.g. NaN fill values) to zero.
+         where (.not. ieee_is_finite(tmpg)) tmpg = 0._r8
+
+         ! Report total freshwater volume flux in file.
+         fwftot = sum(tmpg)
+         write (lp, '(a,es12.4,a)') ' Sum fwf_mask in file: ', fwftot, &
+                                    ' m3 s-1'
       endif
 
       call xcaput(tmpg, fwf_mask, 1)
@@ -270,6 +280,33 @@ contains
    !$omp end parallel do
 
       call xctilr(fwf_mask, 1, 1, nbdy, nbdy, halo_ps)
+
+      ! Global hosing volume flux [m3 s-1] applied on the model grid with
+      ! hosing fraction equal to one. Differs from the sum in the file if
+      ! the file has non-zero values on land points.
+      vflx(:, :) = 0._r8
+   !$omp parallel do private(i)
+      do j = 1, jj
+         do i = 1, ii
+            vflx(i, j) = fwf_mask(i, j)*scp2(i, j)/(rho_fw*L_mks2cgs**2)
+         enddo
+      enddo
+   !$omp end parallel do
+      call xcsum(fwf_total, vflx, ips)
+
+      if (mnproc == 1) then
+         write (lp, '(a,es12.4,a,f8.4,a)') &
+            ' Maximum hosing applied: ', fwf_total, ' m3 s-1 = ', &
+            fwf_total*1.e-6_r8, ' Sv'
+         if (abs(fwf_total - fwf_scale*fwftot) &
+             > fwf_tol*abs(fwf_scale*fwftot)) then
+            write (lp, '(a,es12.4,a)') &
+               ' WARNING: read_hosing_file: applied hosing differs from '// &
+               'fwf_scale*(sum in file) = ', fwf_scale*fwftot, ' m3 s-1.'
+            write (lp, '(a)') &
+               '          Check that fwf_file has no values on land points.'
+         endif
+      endif
 
       if (csdiag) then
          if (mnproc == 1) then
@@ -317,5 +354,24 @@ contains
       frac = fwf_frac_start + (fwf_frac_end - fwf_frac_start)*s
 
    end function hosing_fraction
+
+   subroutine log_hosing(frac)
+   ! ---------------------------------------------------------------------------
+   ! Write the hosing fraction and the global hosing flux to the log at the
+   ! first time step of each model day.
+   ! ---------------------------------------------------------------------------
+
+      real(r8), intent(in) :: frac ! Hosing fraction [].
+
+      if (.not. use_hosing) return
+      if (mnproc /= 1 .or. mod(nstep, nstep_in_day) /= 0) return
+
+      write (lp, '(a,i4.4,2(a,i2.2),a,f10.6,a,es12.4,a,f8.4,a)') &
+         ' hosing: ', date%year, '-', date%month, '-', date%day, &
+         '  fraction = ', frac, &
+         '  flux = ', frac*fwf_total, ' m3 s-1 = ', frac*fwf_total*1.e-6_r8, &
+         ' Sv'
+
+   end subroutine log_hosing
 
 end module mod_hosing

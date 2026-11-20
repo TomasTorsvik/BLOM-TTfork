@@ -29,7 +29,8 @@ c
       use mod_xc
       use mod_vcoord, only: vcoord_type_tag, isopyc_bulkml
       use mod_grid, only: scp2, area
-      use mod_hosing, only: use_hosing, fwf_mask, hosing_fraction
+      use mod_hosing, only: use_hosing, fwf_mask, hosing_fraction,
+     .                      log_hosing
       use mod_state, only: dp, temp, saln, p
       use mod_swtfrz, only: swtfrz
       use mod_forcing, only: sref, tflxap, sflxap, tflxdi, sflxdi,
@@ -103,6 +104,7 @@ c
 c --- Fraction of hosing freshwater flux applied at current time
       if (use_hosing) then
         hosefrct=hosing_fraction()
+        call log_hosing(hosefrct)
       else
         hosefrct=0.
       endif
