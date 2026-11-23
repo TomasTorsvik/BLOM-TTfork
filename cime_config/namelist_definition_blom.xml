@@ -6659,4 +6659,14 @@
     <desc>SST mask file for pacemaker experiment</desc>
   </entry>
 
+  <entry id="pacemaker_year_align">
+    <type>integer</type>
+    <category>pacemaker</category>
+    <group>pacemaker</group>
+    <values>
+      <value>-999</value>
+    </values>
+    <desc>Model year corresponding to the first time record (1 January) of pacemaker_SST_file. The SST file holds one record per day, following the model calendar. Required for pacemaker experiments.</desc>
+  </entry>
+
 </entry_id_pg>
